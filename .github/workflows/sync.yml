@@ -1,0 +1,28 @@
+name: Zapis ocen do Excela
+
+on:
+  schedule:
+    - cron: "23 * * * *"   # co godzinę
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency: sync-excel
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install openpyxl requests
+      - run: python scripts/sync_excel.py
+      - name: Commit zmian w Piwa.xlsx
+        run: |
+          git config user.name "liga-piw-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add Piwa.xlsx
+          git diff --staged --quiet || (git commit -m "🤖 Zapis ocen z www do Piwa.xlsx" && git push)
