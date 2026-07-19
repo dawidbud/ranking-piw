@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ranking Piw 🍺</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍺</text></svg>">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Archivo:wght@400;500;600&display=swap');
+  :root{
+    --stout:#171009; --kufel:#221709; --card:#2A1D0E; --edge:#40301A;
+    --amber:#E8A33D; --gold:#F2C14E; --foam:#F6EDDA; --muted:#A08A6B; --red:#C4553B;
+  }
+  *{box-sizing:border-box}
+  html{background:var(--stout)}
+  body{margin:0}
+  .app{min-height:100vh;background:var(--stout);color:var(--foam);
+    font-family:'Archivo',system-ui,sans-serif;max-width:760px;margin:0 auto;padding:0 16px 48px}
+  .loading{padding:80px 0;text-align:center;color:var(--muted);font-size:18px}
+  .error-box{margin:40px 0;padding:20px;background:var(--kufel);border:1px solid var(--red);
+    border-radius:12px;color:var(--foam);font-size:14px;line-height:1.5}
+  .header{position:relative;text-align:center;padding:44px 0 16px}
+  .foam{position:absolute;top:0;left:-16px;right:-16px;height:10px;
+    background:radial-gradient(circle at 10% 100%, var(--foam) 55%, transparent 56%) repeat-x;
+    background-size:22px 12px;opacity:.9}
+  h1{font-family:'Unbounded',sans-serif;font-weight:700;font-size:clamp(28px,6vw,42px);
+    margin:0;color:var(--gold);letter-spacing:.5px}
+  .sub{color:var(--muted);margin:6px 0 0;font-size:14px}
+  .shared-note{color:var(--muted);font-size:12px;margin:8px 0 0;opacity:.8}
+  .toolbar{display:flex;gap:10px;margin:18px 0 12px;flex-wrap:wrap}
+  .search{flex:1;min-width:200px;background:var(--kufel);border:1px solid var(--edge);
+    color:var(--foam);border-radius:10px;padding:12px 14px;font-size:15px;font-family:inherit}
+  .search::placeholder{color:var(--muted)}
+  .search:focus{outline:2px solid var(--amber);outline-offset:1px}
+  .tabs{display:flex;gap:6px;border-bottom:1px solid var(--edge);margin-bottom:18px}
+  .tab{background:none;border:none;color:var(--muted);font-family:'Unbounded',sans-serif;
+    font-size:13px;font-weight:500;padding:10px 14px;cursor:pointer;
+    border-bottom:3px solid transparent;margin-bottom:-1px}
+  .tab.active{color:var(--gold);border-bottom-color:var(--amber)}
+  .rank-card{background:var(--kufel);border:1px solid var(--edge);border-radius:12px;
+    padding:12px 16px 14px;margin-bottom:10px}
+  .rank-card.top{border-color:var(--amber)}
+  .rank-row{display:flex;align-items:center;gap:14px}
+  .rank-pos{font-family:'Unbounded',sans-serif;font-size:18px;min-width:36px;text-align:center;color:var(--muted)}
+  .rank-info{flex:1;min-width:0}
+  .rank-name{font-weight:600}
+  .rank-name a{color:inherit;text-decoration:none}
+  .rank-name a:hover{color:var(--gold);text-decoration:underline}
+  .rank-style{font-size:12px;color:var(--muted);margin-top:2px}
+  .abv{color:var(--amber)}
+  .rank-score-box{text-align:right}
+  .rank-score{font-family:'Unbounded',sans-serif;font-size:22px;color:var(--gold);line-height:1}
+  .rank-score-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:3px}
+  .gauge-wrap{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+  .gauge{display:flex;gap:2px;align-items:flex-end}
+  .seg{width:9px;height:20px;border-radius:2px;background:var(--card)}
+  .seg.major{height:26px;margin-right:4px}
+  .seg:last-child{margin-right:0}
+  .seg.on{background:linear-gradient(to top,#B96F1E,var(--gold))}
+  .gauge-num{font-family:'Unbounded',sans-serif;font-size:14px;color:var(--gold);min-width:42px;text-align:right}
+  .comment{background:var(--card);border-radius:8px;padding:8px 12px;margin-top:10px;font-size:14px;line-height:1.45}
+  .style-tag{display:inline-block;font-size:11px;letter-spacing:.4px;
+    text-transform:uppercase;color:var(--amber);border:1px solid var(--edge);
+    border-radius:99px;padding:2px 9px;margin-right:6px}
+  .unrated-tag{display:inline-block;font-size:11px;letter-spacing:.4px;text-transform:uppercase;
+    color:var(--muted);border:1px dashed var(--edge);border-radius:99px;padding:2px 9px}
+  .section-head{display:flex;align-items:baseline;justify-content:space-between;
+    border-bottom:1px dashed var(--edge);padding-bottom:6px;margin:26px 0 10px}
+  h2{font-family:'Unbounded',sans-serif;font-size:18px;font-weight:500;margin:0;color:var(--foam)}
+  .section-meta{font-size:12px;color:var(--muted)}
+  .empty{color:var(--muted);text-align:center;padding:40px 0}
+  .footer{text-align:center;color:var(--muted);font-size:12px;margin-top:30px;line-height:1.6}
+  .footer a{color:var(--amber)}
+  @media (max-width:520px){
+    .seg{width:8px}
+    .rank-row{flex-wrap:wrap}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <div class="foam"></div>
+    <h1>Ranking Piw</h1>
+    <p class="sub" id="sub">Nalewam bazę… 🍺</p>
+    <p class="shared-note">📊 Baza danych to plik Piwa.xlsx w tym repozytorium — edytuj Excela, a strona sama się zaktualizuje.</p>
+  </header>
+
+  <div class="toolbar" id="toolbar" style="display:none">
+    <input class="search" id="search" placeholder="Szukaj piwa (nazwa, rodzaj)…">
+  </div>
+
+  <nav class="tabs" id="tabs" style="display:none">
+    <button class="tab active" data-tab="ranking" id="tab-ranking">Ranking</button>
+    <button class="tab" data-tab="lista" id="tab-lista">Wszystkie piwa</button>
+  </nav>
+
+  <main id="main">
+    <div class="loading">Nalewam wspólną bazę… 🍺</div>
+  </main>
+
+  <footer class="footer" id="footer" style="display:none">
+    Skala ocen: 0,25–5. Baza zapisana w <b>Piwa.xlsx</b> — żeby dodać piwo lub ocenę,
+    wystarczy edytować plik w repozytorium na GitHubie.
+  </footer>
+</div>
+
+<script>
+let beers = [];
+let tab = "ranking";
+let query = "";
+
+function fmt(n){
+  if (n == null) return "—";
+  return String(Math.round(n * 100) / 100).replace(".", ",");
+}
+function esc(s){
+  return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function countLabel(n){
+  if (n === 1) return "1 piwo";
+  if (n >= 2 && n <= 4) return n + " piwa";
+  return n + " piw";
+}
+function gauge(value){
+  let segs = "";
+  for (let i = 0; i < 20; i++){
+    const v = (i + 1) * 0.25;
+    const on = value != null && v <= value + 1e-9;
+    const major = (i + 1) % 4 === 0;
+    segs += '<div class="seg' + (on ? " on" : "") + (major ? " major" : "") + '"></div>';
+  }
+  return '<div class="gauge-wrap"><div class="gauge">' + segs + '</div>' +
+    '<div class="gauge-num">' + (value != null ? fmt(value) : "—") + '</div></div>';
+}
+function nameHtml(b){
+  const n = esc(b.name);
+  return b.link ? '<a href="' + esc(b.link) + '" target="_blank" rel="noopener">' + n + "</a>" : n;
+}
+function matches(b, q){
+  if (!q) return true;
+  return b.name.toLowerCase().includes(q) || (b.style || "").toLowerCase().includes(q);
+}
+
+function rankCard(b, pos){
+  const medal = pos === 1 ? "🥇" : pos === 2 ? "🥈" : pos === 3 ? "🥉" : pos;
+  return '<div class="rank-card' + (pos <= 3 ? " top" : "") + '">' +
+    '<div class="rank-row">' +
+      (pos ? '<div class="rank-pos">' + medal + "</div>" : "") +
+      '<div class="rank-info">' +
+        '<div class="rank-name">' + nameHtml(b) + "</div>" +
+        '<div class="rank-style">' +
+          (b.style ? '<span class="style-tag">' + esc(b.style) + "</span>" : "") +
+          (b.abv != null ? '<span class="abv">' + fmt(b.abv) + "%</span>" : "") +
+          (b.rating == null ? ' <span class="unrated-tag">do spróbowania</span>' : "") +
+        "</div>" +
+      "</div>" +
+      (b.rating != null ?
+        '<div class="rank-score-box"><div class="rank-score">' + fmt(b.rating) + "</div>" +
+        '<div class="rank-score-label">ocena</div></div>' : "") +
+    "</div>" +
+    (b.rating != null ? gauge(b.rating) : "") +
+    (b.comment ? '<div class="comment">' + esc(b.comment) + "</div>" : "") +
+  "</div>";
+}
+
+function render(){
+  const main = document.getElementById("main");
+  const q = query.trim().toLowerCase();
+
+  if (tab === "ranking"){
+    const ranked = beers.filter(b => b.rating != null).sort((a, c) => c.rating - a.rating || a.name.localeCompare(c.name, "pl"));
+    const shown = ranked.filter(b => matches(b, q));
+    if (!shown.length){
+      main.innerHTML = '<div class="empty">' + (q ? "Nic nie znaleziono w rankingu." : "Ranking jest pusty — uzupełnij oceny w Piwa.xlsx.") + "</div>";
+      return;
+    }
+    main.innerHTML = shown.map(b => rankCard(b, ranked.indexOf(b) + 1)).join("");
+  } else {
+    const rated = beers.filter(b => b.rating != null && matches(b, q)).sort((a, c) => a.name.localeCompare(c.name, "pl"));
+    const unrated = beers.filter(b => b.rating == null && matches(b, q)).sort((a, c) => a.name.localeCompare(c.name, "pl"));
+    if (!rated.length && !unrated.length){
+      main.innerHTML = '<div class="empty">Nic nie znaleziono.</div>';
+      return;
+    }
+    let html = "";
+    if (rated.length){
+      html += '<div class="section-head"><h2>Ocenione</h2><div class="section-meta">' + countLabel(rated.length) + "</div></div>";
+      html += rated.map(b => rankCard(b, 0)).join("");
+    }
+    if (unrated.length){
+      html += '<div class="section-head"><h2>Do spróbowania</h2><div class="section-meta">' + countLabel(unrated.length) + "</div></div>";
+      html += unrated.map(b => rankCard(b, 0)).join("");
+    }
+    main.innerHTML = html;
+  }
+}
+
+function setTab(t){
+  tab = t;
+  document.querySelectorAll(".tab").forEach(el => el.classList.toggle("active", el.dataset.tab === t));
+  document.getElementById("search").placeholder =
+    t === "ranking" ? "Szukaj w rankingu (nazwa, rodzaj)…" : "Szukaj piwa (nazwa, rodzaj)…";
+  render();
+}
+
+async function load(){
+  try {
+    const res = await fetch("Piwa.xlsx?v=" + Date.now());
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const buf = await res.arrayBuffer();
+    const wb = XLSX.read(buf, { type: "array" });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
+
+    beers = rows.slice(1)
+      .filter(r => r && r[1])
+      .map(r => ({
+        name: String(r[1]).trim(),
+        abv: typeof r[2] === "number" ? r[2] : null,
+        style: r[3] ? String(r[3]).trim() : "",
+        rating: typeof r[4] === "number" ? r[4] : null,
+        comment: r[5] && String(r[5]).trim() !== "." ? String(r[5]).trim() : "",
+        link: r[6] && /^https?:\/\//.test(String(r[6]).trim()) ? String(r[6]).trim() : "",
+      }));
+
+    const rated = beers.filter(b => b.rating != null).length;
+    document.getElementById("sub").textContent =
+      beers.length + " piw w bazie · " + rated + " ocenionych";
+    document.getElementById("tab-ranking").textContent = "Ranking (" + rated + ")";
+    document.getElementById("tab-lista").textContent = "Wszystkie piwa (" + beers.length + ")";
+    document.getElementById("toolbar").style.display = "";
+    document.getElementById("tabs").style.display = "";
+    document.getElementById("footer").style.display = "";
+    render();
+  } catch (e) {
+    console.error(e);
+    document.getElementById("sub").textContent = "Ups…";
+    document.getElementById("main").innerHTML =
+      '<div class="error-box"><b>Nie udało się wczytać bazy Piwa.xlsx.</b><br>' +
+      "Upewnij się, że plik Piwa.xlsx leży obok index.html w repozytorium. " +
+      "(Szczegóły błędu w konsoli przeglądarki: " + esc(e.message) + ")</div>";
+  }
+}
+
+document.getElementById("search").addEventListener("input", e => { query = e.target.value; render(); });
+document.querySelectorAll(".tab").forEach(el => el.addEventListener("click", () => setTab(el.dataset.tab)));
+load();
+</script>
+</body>
+</html>
