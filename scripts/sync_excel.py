@@ -22,6 +22,10 @@ COL_LP, COL_MARKA, COL_NAZWA, COL_ABV, COL_RODZAJ = 1, 2, 3, 4, 5
 COL_OCENA, COL_UWAGI, COL_LINK, COL_KOM_WWW, COL_OCENY = 6, 7, 8, 9, 10
 
 
+def empty_store():
+    return {"ratings": {}, "comments": {}, "newBeers": []}
+
+
 def norm(s):
     return " ".join(str(s if s is not None else "").lower().split())
 
@@ -41,9 +45,16 @@ def get_store():
         with open(path, encoding="utf-8") as f:
             return json.load(f)
     import requests
-    r = requests.get(STORE_URL, headers={"Accept": "application/json"}, timeout=30)
-    r.raise_for_status()
-    return r.json()
+    try:
+        r = requests.get(STORE_URL, headers={"Accept": "application/json"}, timeout=30)
+        if r.status_code == 404:
+            print(f"Uwaga: brak zdalnej bazy ({STORE_URL}), używam pustej.", file=sys.stderr)
+            return empty_store()
+        r.raise_for_status()
+        return r.json()
+    except requests.RequestException as e:
+        print(f"Uwaga: nie udało się pobrać zdalnej bazy ({e}), używam pustej.", file=sys.stderr)
+        return empty_store()
 
 
 def put_store(store):
