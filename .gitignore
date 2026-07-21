@@ -1,3 +1,4 @@
 .claude/
 remixed-*.tsx
 .DS_Store
+__pycache__/
