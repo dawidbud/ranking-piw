@@ -41,8 +41,14 @@ def get_store():
         with open(path, encoding="utf-8") as f:
             return json.load(f)
     import requests
-    r = requests.get(STORE_URL, headers={"Accept": "application/json"}, timeout=30)
-    r.raise_for_status()
+    try:
+        r = requests.get(STORE_URL, headers={"Accept": "application/json"}, timeout=30)
+        r.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        if e.response is not None and e.response.status_code == 404:
+            print("UWAGA: magazyn JSON nie istnieje (404) — pomijam synchronizację.")
+            return {"ratings": {}, "comments": {}, "newBeers": []}
+        raise
     return r.json()
 
 
