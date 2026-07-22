@@ -10,7 +10,7 @@
   @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Archivo:wght@400;500;600&display=swap');
   :root{
     --stout:#171009; --kufel:#221709; --card:#2A1D0E; --edge:#40301A;
-    --amber:#E8A33D; --gold:#F2C14E; --foam:#F6EDDA; --muted:#A08A6B; --red:#C4553B;
+    --amber:#E8A33D; --gold:#F2C14E; --foam:#F6EDDA; --muted:#A08A6B; --red:#C4553B; --green:#7FB069;
   }
   *{box-sizing:border-box}
   html{background:var(--stout)}
@@ -20,74 +20,96 @@
   .loading{padding:80px 0;text-align:center;color:var(--muted);font-size:18px}
   .error-box{margin:40px 0;padding:20px;background:var(--kufel);border:1px solid var(--red);
     border-radius:12px;color:var(--foam);font-size:14px;line-height:1.5}
-  .header{position:relative;text-align:center;padding:44px 0 16px}
+  .header{position:relative;text-align:center;padding:40px 0 10px}
   .foam{position:absolute;top:0;left:-16px;right:-16px;height:10px;
     background:radial-gradient(circle at 10% 100%, var(--foam) 55%, transparent 56%) repeat-x;
     background-size:22px 12px;opacity:.9}
   h1{font-family:'Unbounded',sans-serif;font-weight:700;font-size:clamp(28px,6vw,42px);
     margin:0;color:var(--gold);letter-spacing:.5px}
-  .sub{color:var(--muted);margin:6px 0 0;font-size:14px}
-  .me{color:var(--gold);font-weight:600}
   .shared-note{color:var(--muted);font-size:12px;margin:8px 0 0;opacity:.8}
+  /* pasek tożsamości */
+  .idbar{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;
+    color:var(--muted);font-size:13px;margin:10px 0 0}
+  .me{color:var(--gold);font-weight:600}
   .name-box{background:var(--kufel);border:1px solid var(--amber);border-radius:12px;
-    padding:16px;margin-bottom:14px}
+    padding:16px;margin:14px 0}
   .name-title{font-family:'Unbounded',sans-serif;font-size:16px;color:var(--gold)}
   .name-sub{color:var(--muted);font-size:13px;margin:4px 0 10px}
-  .toolbar{display:flex;gap:10px;margin:18px 0 12px;flex-wrap:wrap}
-  .search{flex:1;min-width:200px;background:var(--kufel);border:1px solid var(--edge);
+  /* zakładki */
+  .tabs{display:flex;gap:6px;border-bottom:1px solid var(--edge);margin:16px 0 0;
+    position:sticky;top:0;background:var(--stout);z-index:10;padding-top:8px}
+  .tab{flex:1;background:none;border:none;color:var(--muted);font-family:'Unbounded',sans-serif;
+    font-size:13px;font-weight:500;padding:11px 6px;cursor:pointer;
+    border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap}
+  .tab:hover{color:var(--foam)}
+  .tab.active{color:var(--gold);border-bottom-color:var(--amber)}
+  /* pasek narzędzi (wyszukiwarka + sort + dodaj) */
+  .controls{display:flex;gap:10px;margin:16px 0 4px;flex-wrap:wrap}
+  .search{flex:1;min-width:180px;background:var(--kufel);border:1px solid var(--edge);
     color:var(--foam);border-radius:10px;padding:12px 14px;font-size:15px;font-family:inherit}
   .search::placeholder,.add-form input::placeholder,.comment-form input::placeholder{color:var(--muted)}
-  .search:focus,.add-form input:focus,.comment-form input:focus{outline:2px solid var(--amber);outline-offset:1px}
+  .search:focus,.add-form input:focus,.comment-form input:focus,.sort:focus{outline:2px solid var(--amber);outline-offset:1px}
+  .sort{background:var(--kufel);border:1px solid var(--edge);color:var(--foam);border-radius:10px;
+    padding:0 12px;font-size:14px;font-family:inherit;cursor:pointer}
   .btn{background:var(--amber);color:#221503;border:none;border-radius:10px;
-    padding:12px 18px;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit}
+    padding:12px 18px;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit;white-space:nowrap}
   .btn:hover{background:var(--gold)}
   .btn.small{padding:9px 14px}
   .btn.ghost{background:var(--kufel);border:1px solid var(--edge);color:var(--foam);padding:12px 14px}
   .btn.ghost:hover{border-color:var(--amber)}
-  .btn.wide{width:100%;padding:14px;font-size:15px}
   .add-form{display:grid;grid-template-columns:1fr 1fr;gap:10px;background:var(--kufel);
-    border:1px solid var(--edge);border-radius:12px;padding:14px;margin-bottom:12px}
+    border:1px solid var(--amber);border-radius:12px;padding:14px;margin:12px 0}
   .add-form input{background:var(--card);border:1px solid var(--edge);color:var(--foam);
     border-radius:8px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .add-form .add-title{grid-column:1/-1;font-family:'Unbounded',sans-serif;font-size:14px;color:var(--gold)}
   .add-form .btn{grid-column:1/-1}
-  .tabs{display:flex;gap:6px;border-bottom:1px solid var(--edge);margin-bottom:18px}
-  .tab{background:none;border:none;color:var(--muted);font-family:'Unbounded',sans-serif;
-    font-size:13px;font-weight:500;padding:10px 14px;cursor:pointer;
-    border-bottom:3px solid transparent;margin-bottom:-1px}
-  .tab.active{color:var(--gold);border-bottom-color:var(--amber)}
-  .brand{margin-bottom:26px}
-  .brand-head{display:flex;align-items:baseline;justify-content:space-between;
-    border-bottom:1px dashed var(--edge);padding-bottom:6px;margin-bottom:10px}
-  h2{font-family:'Unbounded',sans-serif;font-size:18px;font-weight:500;margin:0;color:var(--foam)}
-  .brand-meta{font-size:12px;color:var(--muted)}
+  .tab-hint{color:var(--muted);font-size:13px;margin:14px 0 2px;line-height:1.5}
+  /* podsumowanie */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0 6px}
+  .stat{background:var(--kufel);border:1px solid var(--edge);border-radius:12px;padding:12px 8px;text-align:center}
+  .stat-num{font-family:'Unbounded',sans-serif;font-size:22px;color:var(--gold);line-height:1}
+  .stat-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:6px}
+  /* pasek postępu */
+  .progress-wrap{background:var(--kufel);border:1px solid var(--edge);border-radius:12px;padding:14px 16px;margin:16px 0}
+  .progress-top{display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px}
+  .progress-top b{color:var(--gold)}
+  .progress-bar{height:8px;background:var(--card);border-radius:99px;overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(to right,#B96F1E,var(--gold));border-radius:99px;transition:width .3s}
+  /* nagłówki sekcji */
+  .section-head{display:flex;align-items:baseline;justify-content:space-between;
+    border-bottom:1px dashed var(--edge);padding-bottom:6px;margin:24px 0 12px}
+  h2{font-family:'Unbounded',sans-serif;font-size:16px;font-weight:500;margin:0;color:var(--foam)}
+  .section-meta{font-size:12px;color:var(--muted)}
   .brand-avg{color:var(--amber)}
+  /* karty */
   .card{background:var(--kufel);border:1px solid var(--edge);border-radius:12px;
     padding:14px 16px;margin-bottom:10px}
   .card-top{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:center}
   .card-info{min-width:0}
   .beer-name{font-weight:600;font-size:16px}
-  .beer-name a{color:var(--muted);text-decoration:none;font-size:13px}
-  .beer-name a:hover{color:var(--gold)}
-  .style-tag{display:inline-block;margin-top:4px;margin-right:6px;font-size:11px;letter-spacing:.4px;
-    text-transform:uppercase;color:var(--amber);border:1px solid var(--edge);
-    border-radius:99px;padding:2px 9px}
-  .abv-tag{display:inline-block;margin-top:4px;margin-right:6px;font-size:11px;color:var(--muted)}
-  .avg-tag{display:inline-block;margin-top:4px;font-size:11px;color:var(--muted)}
+  .beer-name a,.rank-name a{color:var(--muted);text-decoration:none;font-size:13px}
+  .beer-name a:hover,.rank-name a:hover{color:var(--gold)}
+  .meta-row{margin-top:5px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .style-tag{font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:var(--amber);
+    border:1px solid var(--edge);border-radius:99px;padding:2px 9px}
+  .abv-tag,.avg-tag{font-size:11px;color:var(--muted)}
+  .added-tag{font-size:11px;color:var(--muted);opacity:.75;font-style:italic}
+  /* miarka oceny */
   .gauge-wrap{display:flex;align-items:center;gap:10px}
   .gauge{display:flex;gap:2px;align-items:flex-end}
-  .seg{width:9px;height:20px;border:none;border-radius:2px;background:var(--card);
+  .seg{width:11px;height:22px;border:none;border-radius:2px;background:var(--card);
     cursor:pointer;padding:0;transition:background .1s,transform .1s}
-  .seg.major{height:26px;margin-right:4px}
+  .seg.major{height:28px;margin-right:4px}
   .seg:last-child{margin-right:0}
   .seg.on{background:linear-gradient(to top,#B96F1E,var(--gold))}
-  .seg:hover{transform:scaleY(1.05)}
-  .gauge-num{font-family:'Unbounded',sans-serif;font-size:16px;color:var(--gold);
-    min-width:48px;text-align:right}
-  .card-actions{display:flex;justify-content:space-between;margin-top:10px}
-  .link-btn{background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;
-    padding:2px 0;font-family:inherit}
+  .seg:hover{transform:scaleY(1.08)}
+  .gauge-num{font-family:'Unbounded',sans-serif;font-size:16px;color:var(--gold);min-width:52px;text-align:right}
+  /* przyciski w karcie */
+  .card-actions{display:flex;justify-content:space-between;margin-top:10px;gap:10px}
+  .link-btn{background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;padding:2px 0;font-family:inherit}
   .link-btn:hover{color:var(--foam)}
   .link-btn.tiny{font-size:11px;text-decoration:underline}
+  /* komentarze */
   .comments{margin-top:10px;border-top:1px solid var(--edge);padding-top:10px}
   .empty-c{color:var(--muted);font-size:13px;margin-bottom:8px}
   .comment{background:var(--card);border-radius:8px;padding:8px 12px;margin-bottom:6px}
@@ -96,41 +118,35 @@
   .comment-form{display:flex;gap:8px;margin-top:8px}
   .comment-form input{flex:1;background:var(--card);border:1px solid var(--edge);
     color:var(--foam);border-radius:8px;padding:9px 12px;font-size:14px;font-family:inherit;min-width:0}
+  .who{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6}
+  .who b{color:var(--foam);font-weight:600}
+  /* karta rankingu */
   .rank-card{background:var(--kufel);border:1px solid var(--edge);border-radius:12px;
     padding:12px 16px 14px;margin-bottom:10px}
   .rank-card.top{border-color:var(--amber)}
+  .rank-card.gold{background:linear-gradient(180deg,rgba(242,193,78,.10),transparent 60%),var(--kufel)}
   .rank-row{display:flex;align-items:center;gap:14px}
-  .rank-pos{font-family:'Unbounded',sans-serif;font-size:18px;min-width:36px;text-align:center;color:var(--muted)}
+  .rank-pos{font-family:'Unbounded',sans-serif;font-size:20px;min-width:38px;text-align:center;color:var(--muted)}
   .rank-info{flex:1;min-width:0}
   .rank-name{font-weight:600}
   .rank-name span{color:var(--amber);font-weight:500}
-  .rank-name a{color:var(--muted);text-decoration:none;font-size:13px}
-  .rank-name a:hover{color:var(--gold)}
   .rank-style{font-size:12px;color:var(--muted);margin-top:2px}
   .rank-score-box{text-align:right}
-  .rank-score{font-family:'Unbounded',sans-serif;font-size:22px;color:var(--gold);line-height:1}
+  .rank-score{font-family:'Unbounded',sans-serif;font-size:24px;color:var(--gold);line-height:1}
   .rank-score-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:3px}
-  .my-rating{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+  .my-rating{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
   .my-label{font-size:12px;color:var(--muted)}
-  .rate-new{margin-top:26px}
-  .rate-panel{margin-top:12px;background:var(--kufel);border:1px solid var(--edge);
-    border-radius:12px;padding:12px}
-  .rate-panel .search{width:100%;margin-bottom:10px;background:var(--card)}
-  .rate-list{max-height:420px;overflow-y:auto;padding-right:4px}
-  .rate-list::-webkit-scrollbar{width:8px}
-  .rate-list::-webkit-scrollbar-thumb{background:var(--edge);border-radius:4px}
-  .unrated-card{opacity:.9;padding:10px 14px;background:var(--card)}
-  .unrated-card:hover{opacity:1}
-  .unrated-card .gauge-num{font-size:14px;min-width:42px}
-  .empty{color:var(--muted);text-align:center;padding:40px 0}
-  .footer{text-align:center;color:var(--muted);font-size:12px;margin-top:30px;line-height:1.6}
+  .empty{color:var(--muted);text-align:center;padding:40px 0;line-height:1.6}
+  .footer{text-align:center;color:var(--muted);font-size:12px;margin-top:34px;line-height:1.6}
   @media (max-width:520px){
     .card-top{flex-direction:column;align-items:flex-start}
     .add-form{grid-template-columns:1fr}
-    .seg{width:8px}
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .seg{width:10px}
     .rank-row{flex-wrap:wrap}
+    .tab{font-size:12px;padding:11px 4px}
   }
-  @media (prefers-reduced-motion:reduce){.seg{transition:none}}
+  @media (prefers-reduced-motion:reduce){.seg,.progress-fill{transition:none}}
 </style>
 </head>
 <body>
@@ -138,46 +154,52 @@
   <header class="header">
     <div class="foam"></div>
     <h1>Liga Piw</h1>
-    <p class="sub" id="sub">Nalewam wspólną bazę… 🍺</p>
-    <p class="shared-note">🌍 Baza jest wspólna — oceny i komentarze widzą wszyscy, a raz na godzinę zapisują się do Piwa.xlsx w repozytorium.</p>
+    <p class="shared-note">🌍 Wspólny ranking — Twoje oceny i komentarze widzą wszyscy znajomi.</p>
+    <div class="idbar" id="idbar"></div>
   </header>
 
   <div class="name-box" id="name-box" style="display:none">
     <div class="name-title">Jak się podpisujesz?</div>
-    <div class="name-sub">Twoje imię lub ksywka pojawi się przy ocenach i komentarzach.</div>
+    <div class="name-sub">Twoje imię lub ksywka pojawi się przy Twoich ocenach i komentarzach.</div>
     <div class="comment-form">
       <input id="name-input" placeholder="np. Bartek" maxlength="30">
       <button class="btn small" data-action="save-name">Zapisz</button>
     </div>
   </div>
 
-  <div class="toolbar" id="toolbar" style="display:none">
-    <input class="search" id="search" placeholder="Szukaj w rankingu (marka, nazwa, rodzaj)…">
-    <button class="btn ghost" id="refresh-btn" data-action="refresh" title="Pobierz najnowsze oceny innych osób">🔄</button>
-    <button class="btn" id="add-toggle" data-action="toggle-add">+ Dodaj piwo</button>
+  <nav class="tabs" id="tabs" style="display:none">
+    <button class="tab active" data-action="tab" data-tab="ranking">🏆 Ranking</button>
+    <button class="tab" data-action="tab" data-tab="ocen">🍺 Oceniaj</button>
+    <button class="tab" data-action="tab" data-tab="katalog">📋 Katalog</button>
+  </nav>
+
+  <div class="controls" id="controls" style="display:none">
+    <input class="search" id="search" placeholder="Szukaj…">
+    <select class="sort" id="sort" style="display:none">
+      <option value="best">🏅 Najlepsze</option>
+      <option value="count">👥 Najwięcej ocen</option>
+      <option value="abc">🔤 Alfabetycznie</option>
+    </select>
+    <button class="btn ghost" id="refresh-btn" data-action="refresh" title="Pobierz najnowsze oceny znajomych">🔄</button>
+    <button class="btn" id="add-toggle" data-action="toggle-add" style="display:none">+ Dodaj piwo</button>
   </div>
 
   <div class="add-form" id="add-form" style="display:none">
+    <div class="add-title">Nowe piwo do Ligi</div>
     <input id="f-marka" placeholder="Marka / browar (np. Pinta)">
     <input id="f-nazwa" placeholder="Nazwa piwa (np. Atak Chmielu)">
     <input id="f-abv" placeholder="% alkoholu (np. 5,5) — opcjonalnie">
     <input id="f-rodzaj" placeholder="Rodzaj (np. IPA)">
-    <button class="btn" data-action="add-beer">Zapisz piwo</button>
+    <button class="btn" data-action="add-beer">Dodaj do Ligi</button>
   </div>
-
-  <nav class="tabs" id="tabs" style="display:none">
-    <button class="tab active" data-action="tab" data-tab="ranking" id="tab-ranking">Ranking</button>
-    <button class="tab" data-action="tab" data-tab="lista" id="tab-lista">Wszystkie piwa</button>
-  </nav>
 
   <main id="main">
     <div class="loading">Nalewam wspólną bazę… 🍺</div>
   </main>
 
   <footer class="footer" id="footer" style="display:none">
-    Oceny i nowe piwa zapisują się od razu we wspólnej bazie, a robot raz na godzinę
-    przepisuje je do pliku <b>Piwa.xlsx</b> w repozytorium. Kliknij 🔄, aby zobaczyć
-    najnowsze oceny znajomych.
+    Oceny, komentarze i nowe piwa zapisują się od razu we wspólnej bazie, a robot raz na
+    godzinę przepisuje je do pliku <b>Piwa.xlsx</b>. Kliknij 🔄, aby pobrać najnowsze oceny znajomych.
   </footer>
 </div>
 
@@ -203,8 +225,7 @@ let excelBeers = [];
 let store = { ratings: {}, comments: {}, newBeers: [] };
 let tab = "ranking";
 let query = "";
-let rateQuery = "";
-let showRate = false;
+let sortBy = "best";
 let openComments = new Set();
 let loaded = false;
 
@@ -231,7 +252,8 @@ function beersLabel(n){
 function allBeers(){
   const ids = new Set(excelBeers.map(b => b.id));
   const extra = (store.newBeers || []).filter(b => b && b.id && !ids.has(b.id))
-    .map(b => ({ id: b.id, marka: b.marka, nazwa: b.nazwa, abv: b.abv ?? null, rodzaj: b.rodzaj || "Inne", uwagi: "", link: "", excelRating: null }));
+    .map(b => ({ id: b.id, marka: b.marka, nazwa: b.nazwa, abv: b.abv ?? null, rodzaj: b.rodzaj || "Inne",
+                 uwagi: "", link: "", excelRating: null, addedBy: b.addedBy || "" }));
   return [...excelBeers, ...extra];
 }
 function ratingsOf(b){
@@ -366,6 +388,7 @@ function addBeer(){
   ["f-marka","f-nazwa","f-abv","f-rodzaj"].forEach(i => document.getElementById(i).value = "");
   document.getElementById("add-form").style.display = "none";
   document.getElementById("add-toggle").textContent = "+ Dodaj piwo";
+  openComments.add(id); // pokaż od razu w „Do oceny”
 }
 async function refresh(){
   setSyncing(true);
@@ -378,8 +401,8 @@ async function refresh(){
   finally { setSyncing(false); }
 }
 
-// ————— rysowanie —————
-function gaugeHtml(b, small){
+// ————— fragmenty widoku —————
+function gaugeHtml(b){
   const value = myRating(b);
   let segs = "";
   for (let i = 0; i < 20; i++){
@@ -393,15 +416,25 @@ function gaugeHtml(b, small){
   return '<div class="gauge-wrap"><div class="gauge" data-value="' + (value ?? "") + '">' + segs + '</div>' +
     '<div class="gauge-num">' + (value != null ? fmtRating(value) : "oceń") + '</div></div>';
 }
-function nameHtml(b, ranked){
-  const linkIcon = b.link ? ' <a href="' + esc(b.link) + '" target="_blank" rel="noopener" title="Więcej o tym piwie">↗</a>' : "";
-  if (ranked) return esc(b.marka) + (b.nazwa ? ' <span>' + esc(b.nazwa) + "</span>" : "") + linkIcon;
-  return esc(b.nazwa || b.marka) + linkIcon;
+function linkIconHtml(b){
+  return b.link ? ' <a href="' + esc(b.link) + '" target="_blank" rel="noopener" title="Więcej o tym piwie">↗</a>' : "";
 }
-function commentsHtml(b){
+function addedTagHtml(b){
+  return b.addedBy ? '<span class="added-tag">dodał: ' + esc(b.addedBy) + "</span>" : "";
+}
+function whoHtml(b){
+  const entries = Object.entries(ratingsOf(b));
+  if (!entries.length) return "";
+  entries.sort((a, c) => c[1] - a[1]);
+  return '<div class="who">Kto oceniał: ' +
+    entries.map(([a, v]) => esc(a) + " <b>" + fmtRating(v) + "</b>").join(" · ") + "</div>";
+}
+function commentsBlock(b, showWho){
   const list = commentsOf(b);
   let html = '<div class="comments">';
-  if (b.uwagi) html += '<div class="comment"><div class="comment-text">' + esc(b.uwagi) + '</div><div class="comment-date">Dawid · notatka z Excela</div></div>';
+  if (showWho) html += whoHtml(b);
+  if (b.uwagi) html += '<div class="comment"><div class="comment-text">' + esc(b.uwagi) +
+    '</div><div class="comment-date">notatka degustacyjna (z Excela)</div></div>';
   if (!list.length && !b.uwagi) html += '<div class="empty-c">Brak komentarzy — podziel się wrażeniami.</div>';
   for (const c of list){
     html += '<div class="comment"><div class="comment-text">' + esc(c.text) + '</div>' +
@@ -411,21 +444,25 @@ function commentsHtml(b){
     '<button class="btn small" data-action="add-comment" data-id="' + esc(b.id) + '">Dodaj</button></div></div>';
   return html;
 }
-function commentToggle(b){
+function commentsToggle(b, label, showWho){
   const n = commentsOf(b).length + (b.uwagi ? 1 : 0);
   const open = openComments.has(b.id);
+  const txt = (label || "Komentarze") + " (" + n + ")";
   return '<div class="card-actions"><button class="link-btn" data-action="toggle-comments" data-id="' + esc(b.id) + '">' +
-    (open ? "▾" : "▸") + " Komentarze (" + n + ")</button></div>" + (open ? commentsHtml(b) : "");
+    (open ? "▾ " : "▸ ") + txt + "</button></div>" + (open ? commentsBlock(b, showWho) : "");
 }
+
+// ————— karta: RANKING —————
 function rankCard(b, pos){
   const avg = avgOf(b);
   const n = Object.keys(ratingsOf(b)).length;
   const medal = pos === 1 ? "🥇" : pos === 2 ? "🥈" : pos === 3 ? "🥉" : pos;
-  return '<div class="rank-card' + (pos && pos <= 3 ? " top" : "") + '">' +
+  const cls = "rank-card" + (pos && pos <= 3 ? " top" : "") + (pos === 1 ? " gold" : "");
+  return '<div class="' + cls + '">' +
     '<div class="rank-row">' +
-      (pos ? '<div class="rank-pos">' + medal + "</div>" : "") +
+      '<div class="rank-pos">' + medal + "</div>" +
       '<div class="rank-info">' +
-        '<div class="rank-name">' + nameHtml(b, true) + "</div>" +
+        '<div class="rank-name">' + esc(b.marka) + (b.nazwa ? ' <span>' + esc(b.nazwa) + "</span>" : "") + linkIconHtml(b) + "</div>" +
         '<div class="rank-style">' + esc(b.rodzaj || "") +
           (b.abv != null ? " · " + fmtRating(b.abv) + "%" : "") + " · " + countLabel(n) + "</div>" +
       "</div>" +
@@ -433,53 +470,56 @@ function rankCard(b, pos){
       '<div class="rank-score-label">średnia</div></div>' +
     "</div>" +
     '<div class="my-rating"><span class="my-label">Twoja ocena:</span>' + gaugeHtml(b) + "</div>" +
-    commentToggle(b) +
+    commentsToggle(b, "Kto oceniał · komentarze", true) +
   "</div>";
 }
-function beerCard(b){
+// ————— karta: OCENIAJ / KATALOG —————
+function beerCard(b, showBrand){
   const avg = avgOf(b);
   const n = Object.keys(ratingsOf(b)).length;
+  const title = showBrand ? (esc(b.marka) + (b.nazwa ? " " + esc(b.nazwa) : "")) : esc(b.nazwa || b.marka);
   return '<div class="card">' +
     '<div class="card-top">' +
       '<div class="card-info">' +
-        '<div class="beer-name">' + nameHtml(b, false) + "</div>" +
-        (b.rodzaj ? '<span class="style-tag">' + esc(b.rodzaj) + "</span>" : "") +
-        (b.abv != null ? '<span class="abv-tag">' + fmtRating(b.abv) + "%</span>" : "") +
-        (avg != null ? '<span class="avg-tag">śr. ' + fmtRating(avg) + " · " + countLabel(n) + "</span>" : "") +
+        '<div class="beer-name">' + title + linkIconHtml(b) + "</div>" +
+        '<div class="meta-row">' +
+          (b.rodzaj ? '<span class="style-tag">' + esc(b.rodzaj) + "</span>" : "") +
+          (b.abv != null ? '<span class="abv-tag">' + fmtRating(b.abv) + "%</span>" : "") +
+          (avg != null ? '<span class="avg-tag">śr. ' + fmtRating(avg) + " · " + countLabel(n) + "</span>" : "") +
+          addedTagHtml(b) +
+        "</div>" +
       "</div>" +
       gaugeHtml(b) +
     "</div>" +
-    commentToggle(b) +
+    commentsToggle(b, "Komentarze", false) +
   "</div>";
-}
-function unratedCard(b){
-  const avg = avgOf(b);
-  return '<div class="rank-card unrated-card">' +
-    '<div class="rank-row">' +
-      '<div class="rank-info">' +
-        '<div class="rank-name">' + nameHtml(b, true) + "</div>" +
-        '<div class="rank-style">' + esc(b.rodzaj || "") + (avg != null ? " · śr. " + fmtRating(avg) : "") + "</div>" +
-      "</div>" +
-      gaugeHtml(b, true) +
-    "</div>" +
-  "</div>";
-}
-function unratedList(){
-  const rq = rateQuery.trim().toLowerCase();
-  return allBeers()
-    .filter(b => myRating(b) == null)
-    .filter(b => matches(b, rq))
-    .sort((a, c) => a.marka.localeCompare(c.marka, "pl") || a.nazwa.localeCompare(c.nazwa, "pl"));
-}
-function renderRateList(){
-  const el = document.getElementById("rate-list");
-  if (!el) return;
-  const list = unratedList();
-  el.innerHTML = list.length
-    ? list.map(unratedCard).join("")
-    : '<div class="empty-c">Brak piw pasujących do wyszukiwania — wszystko już ocenione!</div>';
 }
 
+// ————— podsumowanie (Ranking) —————
+function statsHtml(){
+  const beers = allBeers();
+  const rated = beers.filter(b => avgOf(b) != null);
+  const tasters = new Set();
+  beers.forEach(b => Object.keys(ratingsOf(b)).forEach(a => tasters.add(a)));
+  const leagueAvg = rated.length ? rated.reduce((s, b) => s + avgOf(b), 0) / rated.length : null;
+  const tile = (num, label) => '<div class="stat"><div class="stat-num">' + num + '</div><div class="stat-label">' + label + "</div></div>";
+  return '<div class="stats">' +
+    tile(beers.length, "piw w bazie") +
+    tile(rated.length, "ocenionych") +
+    tile(tasters.size || "—", "degustatorów") +
+    tile(fmtRating(leagueAvg), "średnia ligi") +
+  "</div>";
+}
+
+function sortRanked(list){
+  const arr = list.slice();
+  if (sortBy === "count") arr.sort((a, c) => Object.keys(ratingsOf(c)).length - Object.keys(ratingsOf(a)).length || avgOf(c) - avgOf(a));
+  else if (sortBy === "abc") arr.sort((a, c) => a.marka.localeCompare(c.marka, "pl") || a.nazwa.localeCompare(c.nazwa, "pl"));
+  else arr.sort((a, c) => avgOf(c) - avgOf(a) || a.marka.localeCompare(c.marka, "pl"));
+  return arr;
+}
+
+// ————— render —————
 function render(){
   if (!loaded) return;
   const main = document.getElementById("main");
@@ -487,25 +527,42 @@ function render(){
   const beers = allBeers();
 
   if (tab === "ranking"){
-    const ranked = beers.filter(b => avgOf(b) != null)
-      .sort((a, c) => avgOf(c) - avgOf(a) || a.marka.localeCompare(c.marka, "pl"));
+    let html = statsHtml();
+    const ranked = sortRanked(beers.filter(b => avgOf(b) != null));
     const shown = ranked.filter(b => matches(b, q));
-    let html = "";
     if (!shown.length){
-      html += '<div class="empty">' + (q ? "Brak ocenionych piw pasujących do wyszukiwania." : "Ranking jest pusty — kliknij „Oceń nowe piwo” poniżej.") + "</div>";
+      html += '<div class="empty">' + (q ? "Brak ocenionych piw pasujących do wyszukiwania."
+        : "Ranking jest pusty — przejdź do zakładki 🍺 Oceniaj i zacznij od pierwszej oceny.") + "</div>";
     } else {
-      html += shown.map(b => rankCard(b, q ? shown.indexOf(b) + 1 : ranked.indexOf(b) + 1)).join("");
+      html += shown.map((b) => rankCard(b, sortBy === "best" && !q ? ranked.indexOf(b) + 1 : 0)).join("");
     }
-    html += '<div class="rate-new"><button class="btn wide" data-action="toggle-rate">' +
-      (showRate ? "Zamknij" : "🍺 Oceń nowe piwo") + "</button>";
-    if (showRate){
-      html += '<div class="rate-panel"><input class="search" id="rate-search" value="' + esc(rateQuery) +
-        '" placeholder="Znajdź piwo do oceny (marka, nazwa, rodzaj)…"><div class="rate-list" id="rate-list"></div></div>';
-    }
-    html += "</div>";
     main.innerHTML = html;
-    if (showRate) renderRateList();
-  } else {
+
+  } else if (tab === "ocen"){
+    const total = beers.length;
+    const mine = beers.filter(b => myRating(b) != null).length;
+    const pct = total ? Math.round(mine / total * 100) : 0;
+    let html = '<div class="tab-hint">Kliknij miarkę, żeby ocenić (skala 0,25–5). Rozwiń „Komentarze”, aby dopisać wrażenia. Nie ma Twojego piwa? Kliknij <b>+ Dodaj piwo</b>.</div>';
+    html += '<div class="progress-wrap"><div class="progress-top"><span>Twój postęp</span>' +
+      '<span><b>' + mine + '</b> z ' + total + " piw</span></div>" +
+      '<div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%"></div></div></div>';
+
+    const todo = beers.filter(b => myRating(b) == null && matches(b, q))
+      .sort((a, c) => a.marka.localeCompare(c.marka, "pl") || a.nazwa.localeCompare(c.nazwa, "pl"));
+    const done = beers.filter(b => myRating(b) != null && matches(b, q))
+      .sort((a, c) => a.marka.localeCompare(c.marka, "pl") || a.nazwa.localeCompare(c.nazwa, "pl"));
+
+    html += '<div class="section-head"><h2>🍺 Do oceny</h2><div class="section-meta">' + beersLabel(todo.length) + "</div></div>";
+    html += todo.length ? todo.map(b => beerCard(b, true)).join("")
+      : '<div class="empty">' + (q ? "Brak pasujących piw." : "Wszystko ocenione — brawo! 🎉") + "</div>";
+
+    if (done.length){
+      html += '<div class="section-head"><h2>✓ Twoje oceny</h2><div class="section-meta">' + beersLabel(done.length) + "</div></div>";
+      html += done.map(b => beerCard(b, true)).join("");
+    }
+    main.innerHTML = html;
+
+  } else { // katalog
     let visible;
     if (!q) visible = beers;
     else {
@@ -519,27 +576,42 @@ function render(){
     }
     const groups = [...map.entries()].sort((a, c) => a[0].localeCompare(c[0], "pl"));
     if (!groups.length){
-      main.innerHTML = '<div class="empty">Nic nie znaleziono. Dodaj to piwo przyciskiem „+ Dodaj piwo”.</div>';
+      main.innerHTML = '<div class="empty">Nic nie znaleziono. Dodaj to piwo w zakładce 🍺 Oceniaj.</div>';
       return;
     }
     main.innerHTML = groups.map(([brand, list]) => {
       const avgs = list.map(avgOf).filter(a => a != null);
       const bavg = avgs.length ? avgs.reduce((s, a) => s + a, 0) / avgs.length : null;
-      return '<section class="brand"><div class="brand-head"><h2>' + esc(brand) + "</h2>" +
-        '<div class="brand-meta">' + beersLabel(list.length) +
+      return '<div class="section-head"><h2>' + esc(brand) + "</h2>" +
+        '<div class="section-meta">' + beersLabel(list.length) +
         (bavg != null ? '<span class="brand-avg"> · śr. ' + fmtRating(Math.round(bavg * 100) / 100) + "</span>" : "") +
-        "</div></div>" + list.map(beerCard).join("") + "</section>";
+        "</div></div>" +
+        list.sort((a, c) => a.nazwa.localeCompare(c.nazwa, "pl")).map(b => beerCard(b, false)).join("");
     }).join("");
   }
 }
 
+function updateControls(){
+  const searchEl = document.getElementById("search");
+  document.getElementById("sort").style.display = tab === "ranking" ? "" : "none";
+  document.getElementById("add-toggle").style.display = tab === "ocen" ? "" : "none";
+  searchEl.placeholder = tab === "ranking" ? "Szukaj w rankingu…"
+    : tab === "ocen" ? "Szukaj piwa do oceny…" : "Szukaj marki lub piwa…";
+  // schowaj formularz dodawania przy wyjściu z Oceniaj
+  if (tab !== "ocen"){
+    document.getElementById("add-form").style.display = "none";
+    document.getElementById("add-toggle").textContent = "+ Dodaj piwo";
+  }
+}
+
 function updateHeader(){
-  const beers = allBeers();
-  const rated = beers.filter(b => avgOf(b) != null).length;
-  document.getElementById("sub").innerHTML = beers.length + " piw w bazie" +
-    (me ? ' · grasz jako <span class="me">' + esc(me) + '</span> <button class="link-btn tiny" data-action="change-name">zmień</button>' : "");
-  document.getElementById("tab-ranking").textContent = "Ranking (" + rated + ")";
-  document.getElementById("tab-lista").textContent = "Wszystkie piwa (" + beers.length + ")";
+  const idbar = document.getElementById("idbar");
+  if (me){
+    idbar.innerHTML = 'grasz jako <span class="me">' + esc(me) + '</span> ' +
+      '<button class="link-btn tiny" data-action="change-name">zmień</button>';
+  } else {
+    idbar.innerHTML = '<button class="link-btn tiny" data-action="change-name">podpisz się, aby oceniać</button>';
+  }
 }
 
 // ————— start —————
@@ -556,12 +628,16 @@ async function loadExcel(){
       const marka = String(r[1] || "").trim();
       const nazwa = String(r[2] || "").trim();
       const rodzaj = r[4] ? String(r[4]).trim() : "Inne";
+      let uwagi = r[6] && String(r[6]).trim() !== "." ? String(r[6]).trim() : "";
+      let addedBy = "";
+      const m = uwagi.match(/^dodane przez:\s*(.+)$/i);   // metadana, nie komentarz
+      if (m){ addedBy = m[1].trim(); uwagi = ""; }
       return {
         id: beerId(marka, nazwa, rodzaj),
         marka, nazwa, rodzaj,
         abv: typeof r[3] === "number" ? r[3] : null,
         excelRating: typeof r[5] === "number" ? r[5] : null,
-        uwagi: r[6] && String(r[6]).trim() !== "." ? String(r[6]).trim() : "",
+        uwagi, addedBy,
         link: r[7] && /^https?:\/\//.test(String(r[7]).trim()) ? String(r[7]).trim() : "",
       };
     });
@@ -573,13 +649,14 @@ async function start(){
     try { store = await fetchStore(); }
     catch (e) { console.error("Wspólna baza niedostępna:", e); store = emptyStore(); }
     loaded = true;
-    ["toolbar","tabs","footer"].forEach(i => document.getElementById(i).style.display = "");
-    if (!me) askName();
+    ["tabs","controls","footer"].forEach(i => document.getElementById(i).style.display = "");
+    document.getElementById("controls").style.display = "flex";
+    updateControls();
     updateHeader();
+    if (!me) askName();
     render();
   } catch (e) {
     console.error(e);
-    document.getElementById("sub").textContent = "Ups…";
     document.getElementById("main").innerHTML =
       '<div class="error-box"><b>Nie udało się wczytać bazy.</b><br>' + esc(e.message) + "</div>";
   }
@@ -600,7 +677,7 @@ document.getElementById("app").addEventListener("click", e => {
     case "add-comment": {
       const input = document.querySelector('input[data-comment-for="' + CSS.escape(id) + '"]');
       const t = input && input.value.trim();
-      if (t) { addComment(id, t); }
+      if (t) addComment(id, t);
       break;
     }
     case "toggle-comments":
@@ -609,20 +686,17 @@ document.getElementById("app").addEventListener("click", e => {
       break;
     case "tab":
       tab = el.dataset.tab;
+      query = "";
+      document.getElementById("search").value = "";
       document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
-      document.getElementById("search").placeholder =
-        tab === "ranking" ? "Szukaj w rankingu (marka, nazwa, rodzaj)…" : "Szukaj marki — zobaczysz wszystkie jej piwa…";
+      updateControls();
+      window.scrollTo({ top: 0, behavior: "smooth" });
       render();
-      break;
-    case "toggle-rate":
-      showRate = !showRate;
-      render();
-      if (showRate){ const s = document.getElementById("rate-search"); if (s) s.focus(); }
       break;
     case "toggle-add": {
       const f = document.getElementById("add-form");
       const show = f.style.display === "none";
-      f.style.display = show ? "" : "none";
+      f.style.display = show ? "grid" : "none";
       el.textContent = show ? "Anuluj" : "+ Dodaj piwo";
       if (show) document.getElementById("f-marka").focus();
       break;
@@ -647,7 +721,9 @@ document.getElementById("app").addEventListener("keydown", e => {
 });
 document.getElementById("app").addEventListener("input", e => {
   if (e.target.id === "search"){ query = e.target.value; render(); }
-  else if (e.target.id === "rate-search"){ rateQuery = e.target.value; renderRateList(); }
+});
+document.getElementById("app").addEventListener("change", e => {
+  if (e.target.id === "sort"){ sortBy = e.target.value; render(); }
 });
 // podgląd oceny przy najechaniu na miarkę
 document.getElementById("app").addEventListener("mouseover", e => {
