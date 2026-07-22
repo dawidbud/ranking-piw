@@ -102,8 +102,10 @@
   .seg.major{height:28px;margin-right:4px}
   .seg:last-child{margin-right:0}
   .seg.on{background:linear-gradient(to top,#B96F1E,var(--gold))}
-  .seg:hover{transform:scaleY(1.08)}
+  .seg.static{cursor:default}
+  button.seg:hover{transform:scaleY(1.08)}
   .gauge-num{font-family:'Unbounded',sans-serif;font-size:16px;color:var(--gold);min-width:52px;text-align:right}
+  .my-mine{color:var(--gold);font-weight:600}
   /* przyciski w karcie */
   .card-actions{display:flex;justify-content:space-between;margin-top:10px;gap:10px}
   .link-btn{background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;padding:2px 0;font-family:inherit}
@@ -416,6 +418,18 @@ function gaugeHtml(b){
   return '<div class="gauge-wrap"><div class="gauge" data-value="' + (value ?? "") + '">' + segs + '</div>' +
     '<div class="gauge-num">' + (value != null ? fmtRating(value) : "oceń") + '</div></div>';
 }
+// miarka tylko do podglądu (Ranking, Katalog) — nieklikalna, pokazuje podaną wartość
+function staticGaugeHtml(value){
+  let segs = "";
+  for (let i = 0; i < 20; i++){
+    const v = (i + 1) * 0.25;
+    const on = value != null && v <= value + 1e-9;
+    const major = (i + 1) % 4 === 0;
+    segs += '<div class="seg static' + (on ? " on" : "") + (major ? " major" : "") + '"></div>';
+  }
+  return '<div class="gauge-wrap"><div class="gauge">' + segs + '</div>' +
+    '<div class="gauge-num">' + (value != null ? fmtRating(value) : "—") + '</div></div>';
+}
 function linkIconHtml(b){
   return b.link ? ' <a href="' + esc(b.link) + '" target="_blank" rel="noopener" title="Więcej o tym piwie">↗</a>' : "";
 }
@@ -469,14 +483,17 @@ function rankCard(b, pos){
       '<div class="rank-score-box"><div class="rank-score">' + fmtRating(avg) + '</div>' +
       '<div class="rank-score-label">średnia</div></div>' +
     "</div>" +
-    '<div class="my-rating"><span class="my-label">Twoja ocena:</span>' + gaugeHtml(b) + "</div>" +
+    '<div class="my-rating">' + staticGaugeHtml(avg) +
+      (myRating(b) != null ? '<span class="my-label">Twoja ocena: <span class="my-mine">' + fmtRating(myRating(b)) + "</span></span>" : "") +
+    "</div>" +
     commentsToggle(b, "Kto oceniał · komentarze", true) +
   "</div>";
 }
-// ————— karta: OCENIAJ / KATALOG —————
-function beerCard(b, showBrand){
+// ————— karta: OCENIAJ (interactive=true, klikalna miarka) / KATALOG (podgląd) —————
+function beerCard(b, showBrand, interactive){
   const avg = avgOf(b);
   const n = Object.keys(ratingsOf(b)).length;
+  const mine = myRating(b);
   const title = showBrand ? (esc(b.marka) + (b.nazwa ? " " + esc(b.nazwa) : "")) : esc(b.nazwa || b.marka);
   return '<div class="card">' +
     '<div class="card-top">' +
@@ -486,10 +503,11 @@ function beerCard(b, showBrand){
           (b.rodzaj ? '<span class="style-tag">' + esc(b.rodzaj) + "</span>" : "") +
           (b.abv != null ? '<span class="abv-tag">' + fmtRating(b.abv) + "%</span>" : "") +
           (avg != null ? '<span class="avg-tag">śr. ' + fmtRating(avg) + " · " + countLabel(n) + "</span>" : "") +
+          (!interactive && mine != null ? '<span class="avg-tag">· Twoja: <span class="my-mine">' + fmtRating(mine) + "</span></span>" : "") +
           addedTagHtml(b) +
         "</div>" +
       "</div>" +
-      gaugeHtml(b) +
+      (interactive ? gaugeHtml(b) : staticGaugeHtml(avg)) +
     "</div>" +
     commentsToggle(b, "Komentarze", false) +
   "</div>";
@@ -553,12 +571,12 @@ function render(){
       .sort((a, c) => a.marka.localeCompare(c.marka, "pl") || a.nazwa.localeCompare(c.nazwa, "pl"));
 
     html += '<div class="section-head"><h2>🍺 Do oceny</h2><div class="section-meta">' + beersLabel(todo.length) + "</div></div>";
-    html += todo.length ? todo.map(b => beerCard(b, true)).join("")
+    html += todo.length ? todo.map(b => beerCard(b, true, true)).join("")
       : '<div class="empty">' + (q ? "Brak pasujących piw." : "Wszystko ocenione — brawo! 🎉") + "</div>";
 
     if (done.length){
       html += '<div class="section-head"><h2>✓ Twoje oceny</h2><div class="section-meta">' + beersLabel(done.length) + "</div></div>";
-      html += done.map(b => beerCard(b, true)).join("");
+      html += done.map(b => beerCard(b, true, true)).join("");
     }
     main.innerHTML = html;
 
@@ -586,7 +604,7 @@ function render(){
         '<div class="section-meta">' + beersLabel(list.length) +
         (bavg != null ? '<span class="brand-avg"> · śr. ' + fmtRating(Math.round(bavg * 100) / 100) + "</span>" : "") +
         "</div></div>" +
-        list.sort((a, c) => a.nazwa.localeCompare(c.nazwa, "pl")).map(b => beerCard(b, false)).join("");
+        list.sort((a, c) => a.nazwa.localeCompare(c.nazwa, "pl")).map(b => beerCard(b, false, false)).join("");
     }).join("");
   }
 }
@@ -607,7 +625,7 @@ function updateControls(){
 function updateHeader(){
   const idbar = document.getElementById("idbar");
   if (me){
-    idbar.innerHTML = 'grasz jako <span class="me">' + esc(me) + '</span> ' +
+    idbar.innerHTML = 'Piwkujesz jako: <span class="me">' + esc(me) + '</span> ' +
       '<button class="link-btn tiny" data-action="change-name">zmień</button>';
   } else {
     idbar.innerHTML = '<button class="link-btn tiny" data-action="change-name">podpisz się, aby oceniać</button>';
@@ -728,7 +746,7 @@ document.getElementById("app").addEventListener("change", e => {
 // podgląd oceny przy najechaniu na miarkę
 document.getElementById("app").addEventListener("mouseover", e => {
   const seg = e.target.closest(".seg");
-  if (!seg) return;
+  if (!seg || seg.tagName !== "BUTTON") return;   // tylko klikalne miarki (Oceniaj)
   const gauge = seg.parentElement;
   const segs = [...gauge.children];
   const idx = segs.indexOf(seg);
@@ -738,7 +756,7 @@ document.getElementById("app").addEventListener("mouseover", e => {
 });
 document.getElementById("app").addEventListener("mouseout", e => {
   const gauge = e.target.closest(".gauge");
-  if (!gauge || (e.relatedTarget && gauge.contains(e.relatedTarget))) return;
+  if (!gauge || !gauge.querySelector("button") || (e.relatedTarget && gauge.contains(e.relatedTarget))) return;
   const value = gauge.dataset.value === "" ? null : parseFloat(gauge.dataset.value);
   [...gauge.children].forEach((s, i) => s.classList.toggle("on", value != null && (i + 1) * 0.25 <= value + 1e-9));
   const num = gauge.parentElement.querySelector(".gauge-num");
