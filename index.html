@@ -182,8 +182,21 @@
 </div>
 
 <script>
-const STORE_URL = "https://jsonblob.com/api/jsonBlob/019f7c7b-fdba-74c1-ba07-61ceb04ca826";
+// Adres wspólnej bazy jest w store-config.json (robot podmienia go, gdy baza padnie).
+const CONFIG_URL = "store-config.json";
+const FALLBACK_STORE_URL = "https://jsonblob.com/api/jsonBlob/019f8998-9caa-7192-84a6-70fde04098e1";
+let STORE_URL = FALLBACK_STORE_URL;
 const NAME_KEY = "liga-piw:podpis";
+
+async function loadConfig(){
+  try {
+    const res = await fetch(CONFIG_URL + "?v=" + Date.now(), { cache: "no-store" });
+    if (res.ok){
+      const cfg = await res.json();
+      if (cfg && cfg.storeUrl) STORE_URL = cfg.storeUrl;
+    }
+  } catch (e) { console.error("Nie udało się wczytać store-config.json, używam adresu awaryjnego:", e); }
+}
 
 let me = localStorage.getItem(NAME_KEY) || null;
 let excelBeers = [];
@@ -555,6 +568,7 @@ async function loadExcel(){
 }
 async function start(){
   try {
+    await loadConfig();
     await loadExcel();
     try { store = await fetchStore(); }
     catch (e) { console.error("Wspólna baza niedostępna:", e); store = emptyStore(); }

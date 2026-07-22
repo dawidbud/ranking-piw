@@ -1,0 +1,110 @@
+{
+  "ratings": {
+    "maryensztadt craft brewery|summertime papaja, mango & brzoskwinia|fruit ale": {
+      "Dawid": 1
+    },
+    "browar za miastem|dobry moment|fruit ale": {
+      "Dawid": 3,
+      "Jastrząb": 1.75
+    },
+    "trzech kumpli|lager wiedeński|lager wiedeński": {
+      "Dawid": 2
+    },
+    "magic road|mochi green - kiwi, banana & mochi|pastry sour": {
+      "Dawid": 3.5,
+      "Jastrząb": 1.75
+    },
+    "browar gościszewo|ogród mistrza witbier z tymiankiem cytrynowym|witbier": {
+      "Dawid": 1.25,
+      "Jastrząb": 2.75
+    },
+    "browar stu mostów|berry up! strawberry | rasberry | coconut|pastry sour": {
+      "Dawid": 4.5,
+      "Jastrząb": 3.75
+    },
+    "pinta|mild classic|ciemne": {
+      "Dawid": 2
+    },
+    "funky fluid|gelato purple fluff|ice cream sour": {
+      "Dawid": 4,
+      "Jastrząb": 3.5
+    },
+    "pinta|summer beer supply|polish cold ipa": {
+      "Dawid": 1.25
+    },
+    "nepo|smoothie bowl sweet morning cherry cheesecake|pastry sour": {
+      "Dawid": 2.5
+    },
+    "amber|po godzinach | graff|graff": {
+      "Dawid": 3,
+      "Jastrząb": 1
+    },
+    "browar za miastem|wolny wieczór|fruit ale": {
+      "Dawid": 2,
+      "Jastrząb": 3.25
+    },
+    "bojan|bananowe|owocowe": {
+      "Dawid": 2,
+      "Jastrząb": 3.25
+    },
+    "browar zakładowy|sokowirówka – kwaśne ale z malinami i jagodami|sour ale": {
+      "Dawid": 1.5,
+      "Jastrząb": 1.25
+    },
+    "funky fluid|farm '26 to glass citra|hop selection neipa": {
+      "Dawid": 2.5,
+      "Jastrząb": 3
+    },
+    "browar zakładowy|hiszpańskie wakakcje|pastry sour": {
+      "Dawid": 2.5,
+      "Jastrząb": 3.25
+    },
+    "browar zakładowy|wyjąć grill to jest chwila|new zeland west coast ipa": {
+      "Dawid": 2,
+      "Jastrząb": 1.75
+    },
+    "litovel|cerny citron|pełne cytrynowe": {
+      "Dawid": 4,
+      "Jastrząb": 4
+    },
+    "bojan|kwaśna marakuja|sour": {
+      "Jastrząb": 1.75
+    },
+    "funky fluid|farm '26 to glass mosaic|hop selection neipa": {
+      "Jastrząb": 3
+    },
+    "funky fluid|farm '26 to glass simcoe|hop selection neipa": {
+      "Jastrząb": 1.5
+    },
+    "guiness||stout": {
+      "Jastrząb": 5,
+      "MlodyD": 5,
+      "zaskurio de lima": 5
+    },
+    "grupa żywiec|królewskie|jasne": {
+      "Koneser": 5
+    }
+  },
+  "comments": {
+    "guiness||stout": [
+      {
+        "author": "MlodyD",
+        "text": "Komentarz zbędny",
+        "date": "20.07.2026"
+      },
+      {
+        "author": "zaskurio de lima",
+        "text": "Bardzo duzy plus jest taki, ze trzeba zamowic tak duzo az uda sie split the g",
+        "date": "20.07.2026"
+      }
+    ],
+    "grupa żywiec|królewskie|jasne": [
+      {
+        "author": "Koneser",
+        "text": "Doskonała jakość i smak, szczególnie ciepły w puszce",
+        "date": "20.07.2026"
+      }
+    ]
+  },
+  "newBeers": []
+}
