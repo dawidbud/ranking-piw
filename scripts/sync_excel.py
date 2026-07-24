@@ -1,19 +1,17 @@
 #!/usr/bin/env python3
-"""Przepisuje oceny/komentarze/nowe piwa ze wspólnej bazy (jsonblob) do Piwa.xlsx.
+"""Przepisuje oceny/komentarze/nowe piwa z bazy Ligi Piw do Piwa.xlsx.
 
-Uruchamiany co godzinę przez GitHub Actions (.github/workflows/sync.yml).
+Uruchamiany cyklicznie przez GitHub Actions (.github/workflows/sync.yml).
 
-Odporność na znikanie bazy (jsonblob potrafi skasować blob):
-  * adres bazy trzymany jest w store-config.json (a nie na sztywno),
-  * po każdym udanym odczycie zapisujemy wierną kopię do store-backup.json,
-  * jeśli baza zwróci 404, odtwarzamy ją z store-backup.json pod nowym adresem
-    i aktualizujemy store-config.json (system sam się leczy w ciągu godziny).
+Źródło danych: API na Cloudflare Worker + D1 (GET {apiUrl}/api/store).
+Adres API jest w store-config.json (pole "apiUrl"). Po każdym udanym odczycie
+zapisujemy wierną kopię do store-backup.json (zapas bezpieczeństwa w repo).
 
 Kolumny arkusza "Ocenka": A lp, B marka, C nazwa, D %, E rodzaj, F OCENA,
 G uwagi/komentarze, H link, I komentarze www, J oceny szczegółowo.
 
 Zmienne środowiskowe do testów lokalnych:
-  STORE_FILE — czytaj bazę z pliku zamiast z sieci (pomija też zapis sieciowy)
+  STORE_FILE — czytaj bazę z pliku zamiast z sieci
 """
 import json
 import os
@@ -25,7 +23,7 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 XLSX = os.path.join(ROOT, "Piwa.xlsx")
 CONFIG = os.path.join(ROOT, "store-config.json")
 BACKUP = os.path.join(ROOT, "store-backup.json")
-FALLBACK_URL = "https://jsonblob.com/api/jsonBlob/019f955d-6c0a-7a09-af80-9f1553afcdc1"
+FALLBACK_API = "https://liga-piw.budyta68.workers.dev"
 
 COL_LP, COL_MARKA, COL_NAZWA, COL_ABV, COL_RODZAJ = 1, 2, 3, 4, 5
 COL_OCENA, COL_UWAGI, COL_LINK, COL_KOM_WWW, COL_OCENY = 6, 7, 8, 9, 10
@@ -48,29 +46,15 @@ def norm_store(s):
     return {"ratings": s.get("ratings") or {}, "comments": s.get("comments") or {}, "newBeers": s.get("newBeers") or []}
 
 
-def read_config_url():
+def read_api_url():
     try:
         with open(CONFIG, encoding="utf-8") as f:
-            url = json.load(f).get("storeUrl")
+            url = json.load(f).get("apiUrl")
             if url:
-                return url
+                return url.rstrip("/")
     except (OSError, ValueError):
         pass
-    return FALLBACK_URL
-
-
-def write_config_url(url):
-    with open(CONFIG, "w", encoding="utf-8") as f:
-        json.dump({"storeUrl": url}, f, ensure_ascii=False, indent=2)
-        f.write("\n")
-
-
-def read_backup():
-    try:
-        with open(BACKUP, encoding="utf-8") as f:
-            return norm_store(json.load(f))
-    except (OSError, ValueError):
-        return norm_store({})
+    return FALLBACK_API
 
 
 def write_backup(store):
@@ -80,41 +64,20 @@ def write_backup(store):
 
 
 def get_store():
-    """Zwraca (store, url). Odtwarza bazę z kopii, jeśli zniknęła (404)."""
+    """Zwraca store z API (Worker + D1), albo z pliku przy testach lokalnych."""
     path = os.environ.get("STORE_FILE")
     if path:
         with open(path, encoding="utf-8") as f:
-            return norm_store(json.load(f)), None
+            return norm_store(json.load(f))
 
     import requests
-    url = read_config_url()
-    r = requests.get(url, headers={"Accept": "application/json"}, timeout=30)
-    if r.status_code == 404:
-        print(f"Baza pod {url} zniknęła (404) — odtwarzam z store-backup.json…")
-        backup = read_backup()
-        cr = requests.post("https://jsonblob.com/api/jsonBlob",
-                           headers={"Content-Type": "application/json", "Accept": "application/json"},
-                           data=json.dumps(backup, ensure_ascii=False).encode("utf-8"), timeout=30)
-        cr.raise_for_status()
-        new_url = "https://jsonblob.com" + cr.headers["Location"]
-        write_config_url(new_url)
-        print(f"Odtworzono bazę pod nowym adresem: {new_url}")
-        return backup, new_url
+    r = requests.get(read_api_url() + "/api/store", headers={"Accept": "application/json"}, timeout=30)
     r.raise_for_status()
-    return norm_store(r.json()), url
-
-
-def put_store(url, store):
-    if os.environ.get("STORE_FILE") or not url:
-        return
-    import requests
-    r = requests.put(url, headers={"Content-Type": "application/json"},
-                     data=json.dumps(store, ensure_ascii=False).encode("utf-8"), timeout=30)
-    r.raise_for_status()
+    return norm_store(r.json())
 
 
 def main():
-    store, url = get_store()
+    store = get_store()
     ratings = store["ratings"]
     comments = store["comments"]
     new_beers = store["newBeers"]
@@ -137,12 +100,10 @@ def main():
             max_lp = max(max_lp, int(lp))
 
     changed = False
-    synced_new = []
 
     for nb in new_beers:
         bid = nb.get("id") or beer_id(nb.get("marka"), nb.get("nazwa"), nb.get("rodzaj"))
         if bid in rows_by_id:
-            synced_new.append(bid)
             continue
         last_row += 1
         max_lp += 1
@@ -155,7 +116,6 @@ def main():
         if nb.get("addedBy"):
             ws.cell(row=last_row, column=COL_UWAGI, value=f"dodane przez: {nb['addedBy']}")
         rows_by_id[bid] = last_row
-        synced_new.append(bid)
         changed = True
         print(f"+ nowe piwo: {nb.get('marka')} {nb.get('nazwa')}")
 
@@ -193,25 +153,8 @@ def main():
     else:
         print("Brak zmian w Piwa.xlsx")
 
-    # kopia zapasowa bazy w repo (wierny mirror — z niej odtwarzamy przy awarii)
+    # kopia zapasowa bazy w repo (wierny mirror — zapas bezpieczeństwa)
     write_backup(store)
-
-    # usuń z bazy nowe piwa, które trafiły już do Excela (na świeżej kopii bazy)
-    if synced_new and url:
-        try:
-            fresh, url2 = get_store()
-            url = url2 or url
-            before = len(fresh["newBeers"])
-            fresh["newBeers"] = [
-                nb for nb in fresh["newBeers"]
-                if (nb.get("id") or beer_id(nb.get("marka"), nb.get("nazwa"), nb.get("rodzaj"))) not in synced_new
-            ]
-            if len(fresh["newBeers"]) != before:
-                put_store(url, fresh)
-                write_backup(fresh)
-                print(f"Wyczyszczono {before - len(fresh['newBeers'])} zsynchronizowanych nowych piw z bazy")
-        except Exception as e:  # noqa: BLE001 — czyszczenie jest opcjonalne
-            print(f"Ostrzeżenie: nie udało się wyczyścić newBeers: {e}")
 
     return 0
 

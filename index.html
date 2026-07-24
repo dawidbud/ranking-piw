@@ -213,12 +213,12 @@
 </div>
 
 <script>
-// Adres wspólnej bazy jest w store-config.json (robot podmienia go, gdy baza padnie).
+// Adres API (Cloudflare Worker + D1 / SQLite) jest w store-config.json.
 const CONFIG_URL = "store-config.json";
 const BACKUP_URL = "store-backup.json";
-const FALLBACK_STORE_URL = "https://jsonblob.com/api/jsonBlob/019f955d-6c0a-7a09-af80-9f1553afcdc1";
-let STORE_URL = FALLBACK_STORE_URL;
-let storeOffline = false;   // true, gdy czytamy z kopii zapasowej (blob padł)
+const FALLBACK_API_URL = "https://liga-piw.budyta68.workers.dev";
+let API_URL = FALLBACK_API_URL;
+let storeOffline = false;   // true, gdy czytamy z kopii zapasowej (API chwilowo niedostępne)
 const NAME_KEY = "liga-piw:podpis";
 
 async function loadConfig(){
@@ -226,7 +226,7 @@ async function loadConfig(){
     const res = await fetch(CONFIG_URL + "?v=" + Date.now(), { cache: "no-store" });
     if (res.ok){
       const cfg = await res.json();
-      if (cfg && cfg.storeUrl) STORE_URL = cfg.storeUrl;
+      if (cfg && cfg.apiUrl) API_URL = cfg.apiUrl.replace(/\/+$/, "");
     }
   } catch (e) { console.error("Nie udało się wczytać store-config.json, używam adresu awaryjnego:", e); }
 }
@@ -310,56 +310,43 @@ function normStore(s){
   return { ratings: s.ratings || {}, comments: s.comments || {}, newBeers: s.newBeers || [] };
 }
 async function fetchStore(){
-  const res = await fetch(STORE_URL, { headers: { "Accept": "application/json" }, cache: "no-store" });
+  const res = await fetch(API_URL + "/api/store", { headers: { "Accept": "application/json" }, cache: "no-store" });
   if (!res.ok) throw new Error("HTTP " + res.status);
   return normStore(await res.json());
 }
-// Zmiany trafiają do kolejki i lecą jednym zapisem (jsonblob limituje częste żądania).
-// Przy błędzie (np. HTTP 429) zapis ponawia się automatycznie.
+// Każda zmiana to osobny, atomowy zapis do API (Worker + D1). Zmiany są nakładane
+// lokalnie od razu (płynny interfejs), a POST-y lecą kolejką z automatycznym ponawianiem.
 let pending = [];
-let flushing = false;
-function mutate(fn){
-  store = fn(normStore(store));
-  render();
-  pending.push(fn);
-  flush();
+let sending = false;
+function enqueue(path, body){
+  pending.push({ path, body });
+  drain();
 }
-async function flush(){
-  if (flushing || !pending.length) return;
-  flushing = true;
+async function drain(){
+  if (sending || !pending.length) return;
+  sending = true;
   setSyncing(true);
-  const batch = pending.slice();
+  const item = pending[0];
   try {
-    let fresh;
-    try { fresh = await fetchStore(); } catch { fresh = normStore(store); }
-    let result = fresh;
-    for (const f of batch) result = f(result);
-    for (let attempt = 0; ; attempt++){
-      const res = await fetch(STORE_URL, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(result),
-      });
-      if (res.ok) break;
-      if (attempt >= 3) throw new Error("HTTP " + res.status);
-      await new Promise(r => setTimeout(r, 1500 * (attempt + 1)));
-    }
-    store = result;
-    pending = pending.slice(batch.length);
+    const res = await fetch(API_URL + item.path, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(item.body),
+    });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    pending.shift();
     storeOffline = false;
     updateOfflineBanner();
-    render();
-    if (pending.length) setTimeout(flush, 800);
+    sending = false;
+    setSyncing(pending.length > 0);
+    if (pending.length) drain();
   } catch (e) {
-    console.error("Zapis do wspólnej bazy nie powiódł się, ponawiam:", e);
-    // może robot już odtworzył bazę pod nowym adresem — pobierz świeży config
-    await loadConfig();
+    console.error("Zapis nie powiódł się, ponawiam:", e);
+    await loadConfig();   // adres API mógł się zmienić
     storeOffline = true;
     updateOfflineBanner();
-    setTimeout(flush, 5000);
-  } finally {
-    flushing = false;
-    setSyncing(pending.length > 0);
+    sending = false;
+    setTimeout(drain, 4000);
   }
 }
 function updateOfflineBanner(){
@@ -384,22 +371,25 @@ function saveName(){
 function rate(id, v){
   if (!me) { askName(); return; }
   const b = allBeers().find(x => x.id === id);
-  mutate(d => {
-    const ratings = { ...(d.ratings[id] || {}) };
-    // pierwsza ocena www dla piwa z oceną w Excelu: dopisz też ocenę z Excela
-    if (!Object.keys(ratings).length && b && b.excelRating != null && me !== "Dawid") {
-      ratings["Dawid"] = b.excelRating;
-    }
-    if (v == null) delete ratings[me];
-    else ratings[me] = v;
-    return { ...d, ratings: { ...d.ratings, [id]: ratings } };
-  });
+  const ratings = { ...(store.ratings[id] || {}) };
+  // pierwsza ocena www dla piwa, które ma tylko ocenę z Excela (dodane ręcznie): dopisz ją jako „Dawid”
+  if (!Object.keys(ratings).length && b && b.excelRating != null && me !== "Dawid") {
+    ratings["Dawid"] = b.excelRating;
+    enqueue("/api/rate", { beerId: id, author: "Dawid", value: b.excelRating });
+  }
+  if (v == null) delete ratings[me];
+  else ratings[me] = v;
+  store.ratings = { ...store.ratings, [id]: ratings };
+  render();
+  enqueue("/api/rate", { beerId: id, author: me, value: v });
 }
 function addComment(id, text){
   if (!me) { askName(); return; }
   const c = { author: me, text, date: new Date().toLocaleDateString("pl-PL") };
   openComments.add(id);
-  mutate(d => ({ ...d, comments: { ...d.comments, [id]: [...(d.comments[id] || []), c] } }));
+  store.comments = { ...store.comments, [id]: [...(store.comments[id] || []), c] };
+  render();
+  enqueue("/api/comment", { beerId: id, author: me, text, date: c.date });
 }
 function addBeer(){
   const marka = document.getElementById("f-marka").value.trim();
@@ -411,11 +401,14 @@ function addBeer(){
   if (!me) { askName(); return; }
   const id = beerId(marka, nazwa, rodzaj);
   if (allBeers().some(b => b.id === id)) { alert("To piwo już jest w bazie!"); return; }
-  mutate(d => ({ ...d, newBeers: [...d.newBeers, { id, marka, nazwa, abv, rodzaj, addedBy: me, date: new Date().toLocaleDateString("pl-PL") }] }));
+  const date = new Date().toLocaleDateString("pl-PL");
+  store.newBeers = [...store.newBeers, { id, marka, nazwa, abv, rodzaj, addedBy: me, date }];
+  openComments.add(id); // pokaż od razu w „Do oceny”
+  render();
+  enqueue("/api/beer", { marka, nazwa, abv, rodzaj, addedBy: me, date });
   ["f-marka","f-nazwa","f-abv","f-rodzaj"].forEach(i => document.getElementById(i).value = "");
   document.getElementById("add-form").style.display = "none";
   document.getElementById("add-toggle").textContent = "+ Dodaj piwo";
-  openComments.add(id); // pokaż od razu w „Do oceny”
 }
 async function refresh(){
   setSyncing(true);
