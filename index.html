@@ -20,6 +20,8 @@
   .loading{padding:80px 0;text-align:center;color:var(--muted);font-size:18px}
   .error-box{margin:40px 0;padding:20px;background:var(--kufel);border:1px solid var(--red);
     border-radius:12px;color:var(--foam);font-size:14px;line-height:1.5}
+  .offline-banner{margin:14px 0 0;padding:12px 14px;background:rgba(196,85,59,.12);
+    border:1px solid var(--red);border-radius:12px;color:var(--foam);font-size:13px;line-height:1.5}
   .header{position:relative;text-align:center;padding:40px 0 10px}
   .foam{position:absolute;top:0;left:-16px;right:-16px;height:10px;
     background:radial-gradient(circle at 10% 100%, var(--foam) 55%, transparent 56%) repeat-x;
@@ -169,6 +171,11 @@
     </div>
   </div>
 
+  <div class="offline-banner" id="offline-banner" style="display:none">
+    ⚠️ Wspólna baza chwilowo niedostępna — widzisz ostatnią zapisaną wersję. Nowe oceny zapiszą się,
+    gdy baza wróci (robot odświeża ją co pół godziny). Twoje dane są bezpieczne w Piwa.xlsx.
+  </div>
+
   <nav class="tabs" id="tabs" style="display:none">
     <button class="tab active" data-action="tab" data-tab="ranking">🏆 Ranking</button>
     <button class="tab" data-action="tab" data-tab="ocen">🍺 Oceniaj</button>
@@ -208,8 +215,10 @@
 <script>
 // Adres wspólnej bazy jest w store-config.json (robot podmienia go, gdy baza padnie).
 const CONFIG_URL = "store-config.json";
-const FALLBACK_STORE_URL = "https://jsonblob.com/api/jsonBlob/019f8998-9caa-7192-84a6-70fde04098e1";
+const BACKUP_URL = "store-backup.json";
+const FALLBACK_STORE_URL = "https://jsonblob.com/api/jsonBlob/019f955d-6c0a-7a09-af80-9f1553afcdc1";
 let STORE_URL = FALLBACK_STORE_URL;
+let storeOffline = false;   // true, gdy czytamy z kopii zapasowej (blob padł)
 const NAME_KEY = "liga-piw:podpis";
 
 async function loadConfig(){
@@ -220,6 +229,12 @@ async function loadConfig(){
       if (cfg && cfg.storeUrl) STORE_URL = cfg.storeUrl;
     }
   } catch (e) { console.error("Nie udało się wczytać store-config.json, używam adresu awaryjnego:", e); }
+}
+// Kopia zapasowa w repo — czytana, gdy wspólna baza (blob) chwilowo padnie.
+async function fetchBackup(){
+  const res = await fetch(BACKUP_URL + "?v=" + Date.now(), { cache: "no-store" });
+  if (!res.ok) throw new Error("HTTP " + res.status);
+  return normStore(await res.json());
 }
 
 let me = localStorage.getItem(NAME_KEY) || null;
@@ -331,15 +346,25 @@ async function flush(){
     }
     store = result;
     pending = pending.slice(batch.length);
+    storeOffline = false;
+    updateOfflineBanner();
     render();
     if (pending.length) setTimeout(flush, 800);
   } catch (e) {
     console.error("Zapis do wspólnej bazy nie powiódł się, ponawiam:", e);
-    setTimeout(flush, 4000);
+    // może robot już odtworzył bazę pod nowym adresem — pobierz świeży config
+    await loadConfig();
+    storeOffline = true;
+    updateOfflineBanner();
+    setTimeout(flush, 5000);
   } finally {
     flushing = false;
     setSyncing(pending.length > 0);
   }
+}
+function updateOfflineBanner(){
+  const el = document.getElementById("offline-banner");
+  if (el) el.style.display = storeOffline ? "" : "none";
 }
 
 // ————— akcje —————
@@ -664,13 +689,21 @@ async function start(){
   try {
     await loadConfig();
     await loadExcel();
-    try { store = await fetchStore(); }
-    catch (e) { console.error("Wspólna baza niedostępna:", e); store = emptyStore(); }
+    try {
+      store = await fetchStore();
+      storeOffline = false;
+    } catch (e) {
+      // Blob padł — nie pokazuj pustki: wczytaj kopię zapasową z repo (do odczytu).
+      console.error("Wspólna baza niedostępna, próbuję kopii zapasowej:", e);
+      try { store = await fetchBackup(); storeOffline = true; }
+      catch (e2) { console.error("Kopia zapasowa też niedostępna:", e2); store = emptyStore(); storeOffline = true; }
+    }
     loaded = true;
     ["tabs","controls","footer"].forEach(i => document.getElementById(i).style.display = "");
     document.getElementById("controls").style.display = "flex";
     updateControls();
     updateHeader();
+    updateOfflineBanner();
     if (!me) askName();
     render();
   } catch (e) {

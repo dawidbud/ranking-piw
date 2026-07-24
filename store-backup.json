@@ -67,11 +67,20 @@
       "Dawid": 4,
       "Jastrząb": 4
     },
+    "pinta|summer beer supply|modern west coast ipa": {
+      "Jastrząb": 1.5
+    },
     "bojan|kwaśna marakuja|sour": {
       "Jastrząb": 1.75
     },
+    "inne beczki|hopgang aurora|northern ipa": {
+      "Jastrząb": 2.25
+    },
     "funky fluid|farm '26 to glass mosaic|hop selection neipa": {
       "Jastrząb": 3
+    },
+    "pinta|summer beer supply|session hazy ipa": {
+      "Jastrząb": 1.75
     },
     "funky fluid|farm '26 to glass simcoe|hop selection neipa": {
       "Jastrząb": 1.5
@@ -86,6 +95,13 @@
     }
   },
   "comments": {
+    "litovel|cerny citron|pełne cytrynowe": [
+      {
+        "author": "Jastrząb",
+        "text": "No przepyszny jest, może i dla kobiet w ciąży ale orzeźwiający i daje Liptonem",
+        "date": "22.07.2026"
+      }
+    ],
     "guiness||stout": [
       {
         "author": "MlodyD",

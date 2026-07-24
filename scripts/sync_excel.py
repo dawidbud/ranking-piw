@@ -25,7 +25,7 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 XLSX = os.path.join(ROOT, "Piwa.xlsx")
 CONFIG = os.path.join(ROOT, "store-config.json")
 BACKUP = os.path.join(ROOT, "store-backup.json")
-FALLBACK_URL = "https://jsonblob.com/api/jsonBlob/019f8998-9caa-7192-84a6-70fde04098e1"
+FALLBACK_URL = "https://jsonblob.com/api/jsonBlob/019f955d-6c0a-7a09-af80-9f1553afcdc1"
 
 COL_LP, COL_MARKA, COL_NAZWA, COL_ABV, COL_RODZAJ = 1, 2, 3, 4, 5
 COL_OCENA, COL_UWAGI, COL_LINK, COL_KOM_WWW, COL_OCENY = 6, 7, 8, 9, 10
