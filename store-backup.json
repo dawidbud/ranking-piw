@@ -1,14 +1,16 @@
 {
   "ratings": {
     "maryensztadt craft brewery|summertime papaja, mango & brzoskwinia|fruit ale": {
-      "Dawid": 1
+      "Dawid": 1,
+      "Jastrząb": 3.25
     },
     "browar za miastem|dobry moment|fruit ale": {
       "Dawid": 3,
       "Jastrząb": 1.75
     },
     "trzech kumpli|lager wiedeński|lager wiedeński": {
-      "Dawid": 2
+      "Dawid": 2,
+      "Jastrząb": 2.5
     },
     "magic road|mochi green - kiwi, banana & mochi|pastry sour": {
       "Dawid": 3.5,
@@ -23,17 +25,20 @@
       "Jastrząb": 3.75
     },
     "pinta|mild classic|ciemne": {
-      "Dawid": 2
+      "Dawid": 2,
+      "Jastrząb": 1
     },
     "funky fluid|gelato purple fluff|ice cream sour": {
       "Dawid": 4,
       "Jastrząb": 3.5
     },
     "pinta|summer beer supply|polish cold ipa": {
-      "Dawid": 1.25
+      "Dawid": 1.25,
+      "Jastrząb": 1.5
     },
     "nepo|smoothie bowl sweet morning cherry cheesecake|pastry sour": {
-      "Dawid": 2.5
+      "Dawid": 2.5,
+      "Jastrząb": 3
     },
     "amber|po godzinach | graff|graff": {
       "Dawid": 3,
@@ -91,7 +96,8 @@
       "zaskurio de lima": 5
     },
     "grupa żywiec|królewskie|jasne": {
-      "Koneser": 5
+      "Koneser": 5,
+      "Jastrząb": 0.5
     }
   },
   "comments": {
