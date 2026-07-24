@@ -1,4 +1,3 @@
--- Dane startowe Ligi Piw (odtworzone z Piwa.xlsx). Uruchom RAZ po utworzeniu bazy.
 INSERT INTO ratings (beer_id,author,value) VALUES ('maryensztadt craft brewery|summertime papaja, mango & brzoskwinia|fruit ale','Dawid',1.0) ON CONFLICT(beer_id,author) DO UPDATE SET value=excluded.value;
 INSERT INTO ratings (beer_id,author,value) VALUES ('browar za miastem|dobry moment|fruit ale','Dawid',3.0) ON CONFLICT(beer_id,author) DO UPDATE SET value=excluded.value;
 INSERT INTO ratings (beer_id,author,value) VALUES ('browar za miastem|dobry moment|fruit ale','Jastrząb',1.75) ON CONFLICT(beer_id,author) DO UPDATE SET value=excluded.value;
@@ -40,7 +39,6 @@ INSERT INTO ratings (beer_id,author,value) VALUES ('guiness||stout','Jastrząb',
 INSERT INTO ratings (beer_id,author,value) VALUES ('guiness||stout','MlodyD',5.0) ON CONFLICT(beer_id,author) DO UPDATE SET value=excluded.value;
 INSERT INTO ratings (beer_id,author,value) VALUES ('guiness||stout','zaskurio de lima',5.0) ON CONFLICT(beer_id,author) DO UPDATE SET value=excluded.value;
 INSERT INTO ratings (beer_id,author,value) VALUES ('grupa żywiec|królewskie|jasne','Koneser',5.0) ON CONFLICT(beer_id,author) DO UPDATE SET value=excluded.value;
-
 INSERT INTO comments (beer_id,author,text,date) VALUES ('litovel|cerny citron|pełne cytrynowe','Jastrząb','No przepyszny jest, może i dla kobiet w ciąży ale orzeźwiający i daje Liptonem','22.07.2026');
 INSERT INTO comments (beer_id,author,text,date) VALUES ('guiness||stout','MlodyD','Komentarz zbędny','20.07.2026');
 INSERT INTO comments (beer_id,author,text,date) VALUES ('guiness||stout','zaskurio de lima','Bardzo duzy plus jest taki, ze trzeba zamowic tak duzo az uda sie split the g','20.07.2026');
