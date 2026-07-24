@@ -77,6 +77,8 @@
   .progress-top b{color:var(--gold)}
   .progress-bar{height:8px;background:var(--card);border-radius:99px;overflow:hidden}
   .progress-fill{height:100%;background:linear-gradient(to right,#B96F1E,var(--gold));border-radius:99px;transition:width .3s}
+  .mystat-lines{font-size:13px;color:var(--muted);line-height:1.7;margin:4px 0 2px}
+  .mystat-lines b{color:var(--foam);font-weight:600}
   /* nagłówki sekcji */
   .section-head{display:flex;align-items:baseline;justify-content:space-between;
     border-bottom:1px dashed var(--edge);padding-bottom:6px;margin:24px 0 12px}
@@ -184,6 +186,9 @@
 
   <div class="controls" id="controls" style="display:none">
     <input class="search" id="search" placeholder="Szukaj…">
+    <select class="sort" id="style-filter" style="display:none">
+      <option value="">🍺 Wszystkie rodzaje</option>
+    </select>
     <select class="sort" id="sort" style="display:none">
       <option value="best">🏅 Najlepsze</option>
       <option value="count">👥 Najwięcej ocen</option>
@@ -243,6 +248,7 @@ let store = { ratings: {}, comments: {}, newBeers: [] };
 let tab = "ranking";
 let query = "";
 let sortBy = "best";
+let styleFilter = "";
 let openComments = new Set();
 let loaded = false;
 
@@ -295,6 +301,9 @@ function myRating(b){
 function matches(b, q){
   if (!q) return true;
   return b.marka.toLowerCase().includes(q) || b.nazwa.toLowerCase().includes(q) || (b.rodzaj || "").toLowerCase().includes(q);
+}
+function matchesStyle(b){
+  return !styleFilter || (b.rodzaj || "Inne") === styleFilter;
 }
 
 // ————— zapis do wspólnej bazy (pobierz świeże → nałóż zmianę → wyślij) —————
@@ -416,6 +425,7 @@ async function refresh(){
     const [s] = await Promise.all([fetchStore(), loadExcel()]);
     store = s;
     updateHeader();
+    populateStyleFilter();
     render();
   } catch (e) { console.error(e); }
   finally { setSyncing(false); }
@@ -547,6 +557,39 @@ function statsHtml(){
   "</div>";
 }
 
+// ————— „Twoje statystyki” (Oceniaj) —————
+function myStatsHtml(){
+  const beers = allBeers();
+  const mine = beers.map(b => ({ b, v: myRating(b) })).filter(x => x.v != null);
+  const tile = (num, label) => '<div class="stat"><div class="stat-num">' + num + '</div><div class="stat-label">' + label + "</div></div>";
+  if (!mine.length) return "";
+  const avg = mine.reduce((s, x) => s + x.v, 0) / mine.length;
+  const top = mine.reduce((a, x) => (x.v > a.v ? x : a));
+  const low = mine.reduce((a, x) => (x.v < a.v ? x : a));
+  const myComments = Object.values(store.comments).reduce((s, list) => s + list.filter(c => c.author === me).length, 0);
+  const label = (x) => esc(x.b.marka) + (x.b.nazwa ? " " + esc(x.b.nazwa) : "");
+  return '<div class="section-head"><h2>📊 Twoje statystyki</h2></div>' +
+    '<div class="stats">' +
+      tile(mine.length, "Twoich ocen") +
+      tile(fmtRating(Math.round(avg * 100) / 100), "Twoja średnia") +
+      tile(fmtRating(top.v), "najwyżej") +
+      tile(myComments, "komentarzy") +
+    "</div>" +
+    '<div class="mystat-lines">' +
+      '<div>🥇 Najwyżej: <b>' + label(top) + "</b> — " + fmtRating(top.v) + "</div>" +
+      (mine.length > 1 ? '<div>👎 Najniżej: <b>' + label(low) + "</b> — " + fmtRating(low.v) + "</div>" : "") +
+    "</div>";
+}
+
+function populateStyleFilter(){
+  const sel = document.getElementById("style-filter");
+  if (!sel) return;
+  const prev = styleFilter;
+  const styles = [...new Set(allBeers().map(b => b.rodzaj || "Inne"))].sort((a, b) => a.localeCompare(b, "pl"));
+  sel.innerHTML = '<option value="">🍺 Wszystkie rodzaje</option>' +
+    styles.map(s => '<option value="' + esc(s) + '"' + (s === prev ? " selected" : "") + ">" + esc(s) + "</option>").join("");
+}
+
 function sortRanked(list){
   const arr = list.slice();
   if (sortBy === "count") arr.sort((a, c) => Object.keys(ratingsOf(c)).length - Object.keys(ratingsOf(a)).length || avgOf(c) - avgOf(a));
@@ -565,7 +608,7 @@ function render(){
   if (tab === "ranking"){
     let html = statsHtml();
     const ranked = sortRanked(beers.filter(b => avgOf(b) != null));
-    const shown = ranked.filter(b => matches(b, q));
+    const shown = ranked.filter(b => matches(b, q) && matchesStyle(b));
     if (!shown.length){
       html += '<div class="empty">' + (q ? "Brak ocenionych piw pasujących do wyszukiwania."
         : "Ranking jest pusty — przejdź do zakładki 🍺 Oceniaj i zacznij od pierwszej oceny.") + "</div>";
@@ -582,6 +625,7 @@ function render(){
     html += '<div class="progress-wrap"><div class="progress-top"><span>Twój postęp</span>' +
       '<span><b>' + mine + '</b> z ' + total + " piw</span></div>" +
       '<div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%"></div></div></div>';
+    html += myStatsHtml();
 
     const todo = beers.filter(b => myRating(b) == null && matches(b, q))
       .sort((a, c) => a.marka.localeCompare(c.marka, "pl") || a.nazwa.localeCompare(c.nazwa, "pl"));
@@ -605,6 +649,7 @@ function render(){
       const matchedBrands = new Set(beers.filter(b => b.marka.toLowerCase().includes(q)).map(b => b.marka));
       visible = beers.filter(b => matchedBrands.has(b.marka) || b.nazwa.toLowerCase().includes(q) || (b.rodzaj || "").toLowerCase().includes(q));
     }
+    visible = visible.filter(matchesStyle);
     const map = new Map();
     for (const b of visible){
       if (!map.has(b.marka)) map.set(b.marka, []);
@@ -630,6 +675,7 @@ function render(){
 function updateControls(){
   const searchEl = document.getElementById("search");
   document.getElementById("sort").style.display = tab === "ranking" ? "" : "none";
+  document.getElementById("style-filter").style.display = tab === "ocen" ? "none" : "";
   document.getElementById("add-toggle").style.display = tab === "ocen" ? "" : "none";
   searchEl.placeholder = tab === "ranking" ? "Szukaj w rankingu…"
     : tab === "ocen" ? "Szukaj piwa do oceny…" : "Szukaj marki lub piwa…";
@@ -695,6 +741,7 @@ async function start(){
     ["tabs","controls","footer"].forEach(i => document.getElementById(i).style.display = "");
     document.getElementById("controls").style.display = "flex";
     updateControls();
+    populateStyleFilter();
     updateHeader();
     updateOfflineBanner();
     if (!me) askName();
@@ -731,7 +778,9 @@ document.getElementById("app").addEventListener("click", e => {
     case "tab":
       tab = el.dataset.tab;
       query = "";
+      styleFilter = "";
       document.getElementById("search").value = "";
+      document.getElementById("style-filter").value = "";
       document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
       updateControls();
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -768,6 +817,7 @@ document.getElementById("app").addEventListener("input", e => {
 });
 document.getElementById("app").addEventListener("change", e => {
   if (e.target.id === "sort"){ sortBy = e.target.value; render(); }
+  else if (e.target.id === "style-filter"){ styleFilter = e.target.value; render(); }
 });
 // podgląd oceny przy najechaniu na miarkę
 document.getElementById("app").addEventListener("mouseover", e => {
