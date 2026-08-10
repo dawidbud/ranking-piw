@@ -99,6 +99,9 @@
     "grupa żywiec|królewskie|jasne": {
       "Koneser": 5,
       "Jastrząb": 0.5
+    },
+    "romper strong|premium romper strong|podlak": {
+      "Medzz": 5
     }
   },
   "comments": {
@@ -134,7 +137,24 @@
         "text": "test probe",
         "date": "24.07.2026"
       }
+    ],
+    "romper strong|premium romper strong|podlak": [
+      {
+        "author": "Medzz",
+        "text": "mocne i charakterne",
+        "date": "10.08.2026"
+      }
     ]
   },
-  "newBeers": []
+  "newBeers": [
+    {
+      "id": "romper strong|premium romper strong|podlak",
+      "marka": "Romper strong",
+      "nazwa": "Premium Romper Strong",
+      "abv": 6.2,
+      "rodzaj": "Podlak",
+      "addedBy": "Medzz",
+      "date": "10.08.2026"
+    }
+  ]
 }
