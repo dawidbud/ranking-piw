@@ -102,6 +102,9 @@
     },
     "romper strong|premium romper strong|podlak": {
       "Medzz": 5
+    },
+    "surf|przeniczne|przeniczne": {
+      "Jastrząb": 4
     }
   },
   "comments": {
@@ -155,6 +158,15 @@
       "rodzaj": "Podlak",
       "addedBy": "Medzz",
       "date": "10.08.2026"
+    },
+    {
+      "id": "surf|przeniczne|przeniczne",
+      "marka": "Surf",
+      "nazwa": "Przeniczne",
+      "abv": 5,
+      "rodzaj": "Przeniczne",
+      "addedBy": "Jastrząb",
+      "date": "14.08.2026"
     }
   ]
 }
