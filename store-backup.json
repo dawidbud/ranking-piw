@@ -43,7 +43,8 @@
     },
     "amber|po godzinach | graff|graff": {
       "Dawid": 3,
-      "Jastrząb": 1
+      "Jastrząb": 1,
+      "Rafał": 4
     },
     "browar za miastem|wolny wieczór|fruit ale": {
       "Dawid": 2,
@@ -104,10 +105,38 @@
       "Miras": 3
     },
     "romper strong|premium romper strong|podlak": {
-      "Medzz": 5
+      "Medzz": 5,
+      "Jastrząb": 1.25
     },
     "surf|przeniczne|przeniczne": {
       "Jastrząb": 4
+    },
+    "inne beczki|walloon|belgian ipa": {
+      "Jastrząb": 2,
+      "Koma": 3.75,
+      "Rafał": 3.5
+    },
+    "trzech kumpli|califia|west coast india pale ale": {
+      "Jastrząb": 3,
+      "Koma": 3,
+      "Szymon": 3
+    },
+    "ksiażęce złote pszeniczne|ksiażęce złote pszeniczne|inne": {
+      "MlodyD": 5
+    },
+    "funky fluid|seychelles|mango neipa": {
+      "Jastrząb": 1.25,
+      "Koma": 2.25
+    },
+    "cztery ściany|sorbet|double fruited imperial gose": {
+      "Jastrząb": 3.5,
+      "Koma": 1.25
+    },
+    "funky fluid|double peacharine|double neipa": {
+      "Koma": 2.5
+    },
+    "nepo|one more ipa|session ipa": {
+      "Koma": 3
     }
   },
   "comments": {
@@ -150,6 +179,20 @@
         "text": "mocne i charakterne",
         "date": "10.08.2026"
       }
+    ],
+    "inne beczki|walloon|belgian ipa": [
+      {
+        "author": "Rafał",
+        "text": "Kwasior",
+        "date": "9.10.2026"
+      }
+    ],
+    "cztery ściany|sorbet|double fruited imperial gose": [
+      {
+        "author": "Jastrząb",
+        "text": "Zapach tragiczny ale smak złożony",
+        "date": "9.10.2026"
+      }
     ]
   },
   "newBeers": [
@@ -170,6 +213,78 @@
       "rodzaj": "Przeniczne",
       "addedBy": "Jastrząb",
       "date": "14.08.2026"
+    },
+    {
+      "id": "inne beczki|walloon|belgian ipa",
+      "marka": "Inne Beczki",
+      "nazwa": "Walloon",
+      "abv": 6,
+      "rodzaj": "Belgian IPA",
+      "addedBy": "Jastrząb",
+      "date": "9.10.2026"
+    },
+    {
+      "id": "trzech kumpli|califia|west coast india pale ale",
+      "marka": "Trzech Kumpli",
+      "nazwa": "Califia",
+      "abv": 7,
+      "rodzaj": "West Coast India Pale Ale",
+      "addedBy": "Jastrząb",
+      "date": "9.10.2026"
+    },
+    {
+      "id": "ksiażęce złote pszeniczne|ksiażęce złote pszeniczne|inne",
+      "marka": "Ksiażęce złote pszeniczne",
+      "nazwa": "Ksiażęce złote pszeniczne",
+      "abv": 4.9,
+      "rodzaj": "Inne",
+      "addedBy": "MlodyD",
+      "date": "9.10.2026"
+    },
+    {
+      "id": "funky fluid|seychelles|mango neipa",
+      "marka": "Funky Fluid",
+      "nazwa": "Seychelles",
+      "abv": 6.5,
+      "rodzaj": "Mango NEIPA",
+      "addedBy": "Jastrząb",
+      "date": "9.10.2026"
+    },
+    {
+      "id": "cztery ściany|sorbet|double fruited imperial gose",
+      "marka": "Cztery ściany",
+      "nazwa": "Sorbet",
+      "abv": 5.2,
+      "rodzaj": "Double Fruited Imperial Gose",
+      "addedBy": "Jastrząb",
+      "date": "9.10.2026"
+    },
+    {
+      "id": "funky fluid|double peacharine|double neipa",
+      "marka": "Funky Fluid",
+      "nazwa": "Double Peacharine",
+      "abv": 8,
+      "rodzaj": "Double NEIPA",
+      "addedBy": "Jastrząb",
+      "date": "9.10.2026"
+    },
+    {
+      "id": "nepo|one more ipa|session ipa",
+      "marka": "Nepo",
+      "nazwa": "One More IPA",
+      "abv": 5,
+      "rodzaj": "Session IPA",
+      "addedBy": "Jastrząb",
+      "date": "9.10.2026"
+    },
+    {
+      "id": "nepo|furious green|west coast ipa",
+      "marka": "Nepo",
+      "nazwa": "Furious Green",
+      "abv": 6.3,
+      "rodzaj": "West Coast IPA",
+      "addedBy": "Jastrząb",
+      "date": "9.10.2026"
     }
   ]
 }
